@@ -2,7 +2,7 @@ package com.netcracker.edu.inventory.model.impl;
 
 import com.netcracker.edu.inventory.model.Device;
 
-public class WifiRouter extends AbstractDevice implements Device {
+public class WifiRouter extends Router implements Device {
 
     protected String securityProtocol;
 
