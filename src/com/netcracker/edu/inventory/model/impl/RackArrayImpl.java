@@ -20,29 +20,29 @@ public class RackArrayImpl implements Rack {
 
     @Override
     public int getFreeSize() {
-        int freeSlots = devices.length;
+        int freeSize = 0;
         for (Device device : devices) {
             if (device == null) {
-                freeSlots++;
+                freeSize++;
             }
         }
-        return freeSlots;
+        return freeSize;
     }
 
     @Override
     public Device getDevAtSlot(int index) {
-        if (index >= getFreeSize() || index < 0) {
+        if (index > devices.length - 1 || index < 0) {
             return null;
         }
-        if (devices[index] == null) {
-            return null;
+        if (devices[index] != null) {
+            return devices[index];
         }
-        return devices[index];
+        return null;
     }
 
     @Override
     public boolean insertDevToSlot(Device device, int index) {
-        if (index >= getSize() || index < 0) {
+        if (index > devices.length - 1 || index < 0) {
             return false;
         }
         if (getDevAtSlot(index) != null) {
@@ -57,15 +57,15 @@ public class RackArrayImpl implements Rack {
 
     @Override
     public Device removeDevFromSlot(int index) {
-        if (index >= getFreeSize() || index < 0) {
+        if (index > devices.length - 1 || index < 0) {
             return null;
         }
-        if (devices[index] == null) {
-            return null;
+        if (devices[index] != null) {
+            Device device = devices[index];
+            devices[index] = null;
+            return device;
         }
-        Device device = devices[index];
-        devices[index] = null;
-        return device;
+        return null;
     }
 
     @Override
