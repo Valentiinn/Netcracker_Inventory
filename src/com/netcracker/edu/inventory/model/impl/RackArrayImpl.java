@@ -34,10 +34,7 @@ public class RackArrayImpl implements Rack {
         if (index > devices.length - 1 || index < 0) {
             return null;
         }
-        if (devices[index] != null) {
-            return devices[index];
-        }
-        return null;
+        return devices[index];
     }
 
     @Override
@@ -45,10 +42,10 @@ public class RackArrayImpl implements Rack {
         if (index > devices.length - 1 || index < 0) {
             return false;
         }
-        if (getDevAtSlot(index) != null) {
+        if (devices[index] != null) {
             return false;
         }
-        if (!type.equals(device.getType())) {
+        if (device == null || !type.equals(device.getType())) {
             return false;
         }
         devices[index] = device;
@@ -70,16 +67,11 @@ public class RackArrayImpl implements Rack {
 
     @Override
     public Device getDevByIN(int in) {
-        for (Device device : devices) {
-            if (device != null && device.getIn() == in) {
-                return device;
+        for (int i = 0; i < getSize(); i++) {
+            if (devices[i] != null && (devices[i].getIn() == in)) {
+                return devices[i];
             }
         }
         return null;
     }
-
-    public String getType() {
-        return type;
-    }
-
 }
