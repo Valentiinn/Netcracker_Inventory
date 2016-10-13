@@ -6,7 +6,7 @@ public class DeviceValidationException extends RuntimeException {
 
     private Object notValidDevice;
 
-    public DeviceValidationException(Object notValidDevice) {
+    public DeviceValidationException(String massage, Object notValidDevice) {
         super("Device is not valid for operation");
         this.notValidDevice = notValidDevice;
     }
