@@ -16,6 +16,7 @@ public class RackArrayImpl implements Rack {
     public RackArrayImpl(int size, String type) {
         if (size < 0) {
             IllegalArgumentException e = new IllegalArgumentException("Rack size should not be negative");
+            LOGGER.log(Level.SEVERE, "Incorrect rack size", e);
             throw e;
         }
         if (type == null) {
