@@ -41,12 +41,20 @@ public class AbstractDeviceTest {
         assertEquals(in, result);
     }
 
+    @Deprecated
     @Test
-    public void setGetType() throws Exception {
+    public void setGetTypeDeprecated() throws Exception {
         device.setType(type);
         String result = device.getType();
 
         assertEquals(type, result);
+    }
+
+    @Test
+    public void setGetType() throws Exception {
+        String result = device.getType();
+
+        assertEquals(device.getClass().getSimpleName(), result);
     }
 
     @Test

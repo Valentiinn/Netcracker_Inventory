@@ -16,9 +16,8 @@ public class ServiceImpl implements Service {
 
     @Override
     public DeviceService getDeviceService() {
-        NotImplementedException e = new NotImplementedException();
-        LOGGER.log(Level.SEVERE, "getDeviceService not supported yet.", e);
-        throw e;
+        DeviceService deviceService = new DeviceServiceImpl();
+        return deviceService;
     }
 
     @Override

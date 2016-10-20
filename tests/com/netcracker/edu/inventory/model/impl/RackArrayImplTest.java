@@ -3,9 +3,15 @@ package com.netcracker.edu.inventory.model.impl;
 import com.netcracker.edu.inventory.exception.DeviceValidationException;
 import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.model.Rack;
+import com.netcracker.edu.inventory.service.impl.ServiceImpl;
+import com.netcracker.edu.main.Main;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.logging.LogManager;
 
 import static org.junit.Assert.*;
 
@@ -14,10 +20,10 @@ import static org.junit.Assert.*;
  */
 public class RackArrayImplTest {
 
-    java.lang.String batteryName = new StringBuilder("Bat").append("tery").toString();
-    java.lang.String routerName = new StringBuilder("Rou").append("ter").toString();
-    java.lang.String switchName = new StringBuilder("Swi").append("tch").toString();
-    java.lang.String wifiRouterName = new StringBuilder("Wifi").append("Router").toString();
+    String batteryName = new StringBuilder("Bat").append("tery").toString();
+    String routerName = new StringBuilder("Rou").append("ter").toString();
+    String switchName = new StringBuilder("Swi").append("tch").toString();
+    String wifiRouterName = new StringBuilder("Wifi").append("Router").toString();
 
     RackArrayImpl rackSize0;
     RackArrayImpl rackSize1;
@@ -28,17 +34,21 @@ public class RackArrayImplTest {
 
     Battery battery;
 
+//    @BeforeClass
+//    public static void setUp() throws Exception {
+//        Main.initLogger("/logging.properties");
+//    }
+
     @Before
     public void before() throws Exception {
-        rackSize0 = new RackArrayImpl(0, "Battery");
-        rackSize1 = new RackArrayImpl(1, "Battery");
-        rackSize3 = new RackArrayImpl(3, "Battery");
-        rackEmpty = new RackArrayImpl(10, "Battery");
-        rackPartlyFilled = new RackArrayImpl(10, "Battery");
-        rackFullFilled = new RackArrayImpl(10, "Battery");
+        rackSize0 = new RackArrayImpl(0, Battery.class);
+        rackSize1 = new RackArrayImpl(1, Battery.class);
+        rackSize3 = new RackArrayImpl(3, Battery.class);
+        rackEmpty = new RackArrayImpl(10, Battery.class);
+        rackPartlyFilled = new RackArrayImpl(10, Battery.class);
+        rackFullFilled = new RackArrayImpl(10, Battery.class);
 
         battery = new Battery();
-        battery.setType("Battery");
         battery.setIn(12);
 
         for (int i = 0; i < 10; i++) {
@@ -54,26 +64,95 @@ public class RackArrayImplTest {
 
     }
 
-
+    @Deprecated
     @Test
-    public void constructor() throws Exception {
+    public void constructorDeprecated() throws Exception {
         RackArrayImpl rack0 = new RackArrayImpl(5, batteryName);
         rack0.insertDevToSlot(battery, 0);
         rack0 = new RackArrayImpl(5, routerName);
         Router router = new Router();
-        router.setType("Router");
         router.setIn(1);
         rack0.insertDevToSlot(router, 0);
         rack0 = new RackArrayImpl(5, switchName);
         Switch aSwitch = new Switch();
-        aSwitch.setType("Switch");
         aSwitch.setIn(2);
         rack0.insertDevToSlot(aSwitch, 0);
         rack0 = new RackArrayImpl(5, wifiRouterName);
         WifiRouter wifiRouter = new WifiRouter();
-        wifiRouter.setType("WifiRouter");
         wifiRouter.setIn(3);
         rack0.insertDevToSlot(wifiRouter, 0);
+    }
+
+    @Test
+    public void constructor() throws Exception {
+        RackArrayImpl rack0 = new RackArrayImpl(5, Battery.class);
+        rack0.insertDevToSlot(battery, 0);
+        Device result1 = rack0.getDevAtSlot(0);
+
+        rack0 = new RackArrayImpl(5, Router.class);
+        Router router = new Router();
+        router.setIn(1);
+        rack0.insertDevToSlot(router, 0);
+        Device result2 = rack0.getDevAtSlot(0);
+
+        rack0 = new RackArrayImpl(5, WifiRouter.class);
+        WifiRouter wifiRouter = new WifiRouter();
+        wifiRouter.setIn(1);
+        rack0.insertDevToSlot(wifiRouter, 0);
+        Device result3 = rack0.getDevAtSlot(0);
+
+        rack0 = new RackArrayImpl(5, Switch.class);
+        Switch aSwitch = new Switch();;
+        aSwitch.setIn(1);
+        rack0.insertDevToSlot(aSwitch, 0);
+        Device result4 = rack0.getDevAtSlot(0);
+
+        assertEquals(battery, result1);
+        assertEquals(router, result2);
+        assertEquals(wifiRouter, result3);
+        assertEquals(aSwitch, result4);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructorSizeNegative() throws Exception {
+        RackArrayImpl rack0 = new RackArrayImpl(-5, Battery.class);
+    }
+
+    @Test
+    public void constructorSize0() throws Exception {
+        RackArrayImpl rack0 = new RackArrayImpl(0, Battery.class);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructorTypeNull() throws Exception {
+        RackArrayImpl rack0 = new RackArrayImpl(5, (Class) null);
+    }
+
+    @Test
+    public void constructorTypeDevice() throws Exception {
+        RackArrayImpl rack0 = new RackArrayImpl(5, Device.class);
+        rack0.insertDevToSlot(battery, 0);
+        Device result1 = rack0.getDevAtSlot(0);
+
+        Router router = new Router();
+        router.setIn(1);
+        rack0.insertDevToSlot(router, 1);
+        Device result2 = rack0.getDevAtSlot(1);
+
+        WifiRouter wifiRouter = new WifiRouter();
+        wifiRouter.setIn(1);
+        rack0.insertDevToSlot(wifiRouter, 2);
+        Device result3 = rack0.getDevAtSlot(2);
+
+        Switch aSwitch = new Switch();;
+        aSwitch.setIn(1);
+        rack0.insertDevToSlot(aSwitch, 3);
+        Device result4 = rack0.getDevAtSlot(3);
+
+        assertEquals(battery, result1);
+        assertEquals(router, result2);
+        assertEquals(wifiRouter, result3);
+        assertEquals(aSwitch, result4);
     }
 
     @Test
@@ -165,13 +244,27 @@ public class RackArrayImplTest {
         assertEquals(expCount, count);
     }
 
+    @Deprecated
     @Test
-    public void insertDevToSlot() throws Exception {
+    public void insertDevToSlotDeprecated() throws Exception {
+
+        Rack rackEmpty = new RackArrayImpl(10, "Battery");
+        Rack rackPartlyFilled = new RackArrayImpl(10, "Battery");
+        Rack rackFullFilled = new RackArrayImpl(10, "Battery");
+
+        Battery battery = new Battery();
+        battery.setIn(12);
+
+        for (int i = 0; i < 10; i++) {
+            rackFullFilled.insertDevToSlot(battery, i);
+            if ((i % 2) == 0) {
+                rackPartlyFilled.insertDevToSlot(battery, i);
+            }
+        }
+
         Battery anotherBattery = new Battery();
-        anotherBattery.setType("Battery");
         anotherBattery.setIn(1);
-        Battery batteryBadType = new Battery();
-        batteryBadType.setType("BadBattery");
+        Router batteryBadType = new Router();
         batteryBadType.setIn(1);
 
         Device expResultDev = anotherBattery;
@@ -199,6 +292,41 @@ public class RackArrayImplTest {
         assertFalse(result7);
     }
 
+    @Test
+    public void insertDevToSlot() throws Exception {
+        Battery anotherBattery = new Battery();
+        anotherBattery.setIn(1);
+        Switch batteryBadType = new Switch();
+        batteryBadType.setIn(1);
+        Rack routerRack = new RackArrayImpl(1, Router.class);
+
+        Device expResultDev = anotherBattery;
+
+        boolean result1 = rackPartlyFilled.insertDevToSlot(anotherBattery, 0);
+        boolean result2 = rackPartlyFilled.insertDevToSlot(anotherBattery, 2);
+        boolean result3 = rackPartlyFilled.insertDevToSlot(anotherBattery, 8);
+        boolean result4 = rackEmpty.insertDevToSlot(anotherBattery, 0);
+        Device result4a = rackEmpty.getDevAtSlot(0);
+        boolean result5 = rackEmpty.insertDevToSlot(anotherBattery, 3);
+        Device result5a = rackEmpty.getDevAtSlot(3);
+        boolean result6 = rackEmpty.insertDevToSlot(anotherBattery, 9);
+        Device result6a = rackEmpty.getDevAtSlot(9);
+        boolean result7 = rackPartlyFilled.insertDevToSlot(batteryBadType, 7); //not filled
+        boolean result8 = routerRack.insertDevToSlot(batteryBadType, 0);
+
+        assertFalse(result1);
+        assertFalse(result2);
+        assertFalse(result3);
+        assertTrue(result4);
+        assertEquals(expResultDev, result4a);
+        assertTrue(result5);
+        assertEquals(expResultDev, result5a);
+        assertTrue(result6);
+        assertEquals(expResultDev, result6a);
+        assertFalse(result7);
+        assertTrue(result8);
+    }
+
     @Test(expected = DeviceValidationException.class)
     public void insertDevToSlotDeviceValidationDeviceNullToFilled() throws Exception {
         rackPartlyFilled.insertDevToSlot(null, 4);
@@ -212,17 +340,21 @@ public class RackArrayImplTest {
     @Test(expected = DeviceValidationException.class)
     public void insertDevToSlotDeviceValidationDeviceWithoutIN() throws Exception {
         Battery batteryNoIN = new Battery();
-        batteryNoIN.setType("Battery");
 
         rackPartlyFilled.insertDevToSlot(batteryNoIN, 7); //not filled
     }
 
     @Test(expected = DeviceValidationException.class)
     public void insertDevToSlotDeviceValidationDeviceWithoutType() throws Exception {
-        Battery batteryNoType = new Battery();
-        batteryNoType.setIn(1);
+        Device deviceNoType = new AbstractDevice() {
+            @Override
+            public String getType() {
+                return null;
+            }
+        };
+        deviceNoType.setIn(1);
 
-        rackPartlyFilled.insertDevToSlot(batteryNoType, 7); //not filled
+        rackPartlyFilled.insertDevToSlot(deviceNoType, 7); //not filled
     }
 
     @Test
@@ -300,23 +432,19 @@ public class RackArrayImplTest {
 
     @Test
     public void getDevByIN() throws Exception {
-        RackArrayImpl rack0 = new RackArrayImpl(0, "Battery");
-        RackArrayImpl rack1Full = new RackArrayImpl(1, "Battery");
-        RackArrayImpl rack1Empty = new RackArrayImpl(1, "Battery");
-        RackArrayImpl rackEmpty = new RackArrayImpl(5, "Battery");
-        RackArrayImpl rackPartly = new RackArrayImpl(6, "Battery");
-        RackArrayImpl rackFull = new RackArrayImpl(5, "Battery");
+        RackArrayImpl rack0 = new RackArrayImpl(0, Battery.class);
+        RackArrayImpl rack1Full = new RackArrayImpl(1, Battery.class);
+        RackArrayImpl rack1Empty = new RackArrayImpl(1, Battery.class);
+        RackArrayImpl rackEmpty = new RackArrayImpl(5, Battery.class);
+        RackArrayImpl rackPartly = new RackArrayImpl(6, Battery.class);
+        RackArrayImpl rackFull = new RackArrayImpl(5, Battery.class);
         Battery battery1 = new Battery();
-        battery1.setType("Battery");
         battery1.setIn(1);
         Battery battery2 = new Battery();
-        battery2.setType("Battery");
         battery2.setIn(2);
         Battery battery3 = new Battery();
-        battery3.setType("Battery");
         battery3.setIn(3);
         Battery battery4 = new Battery();
-        battery4.setType("Battery");
         battery4.setIn(4);
         Device[] devicesForRackPartly = new Device[] {battery1, battery4, battery2, battery4, null, battery3};
         Device[] devicesForRackFull = new Device[] {battery3, battery1, battery2, battery3, battery4};
@@ -365,5 +493,34 @@ public class RackArrayImplTest {
         assertEquals(expResultDev1, result12);
         assertEquals(expResultDev2, result13);
     }
+
+    @Test
+    public void getAllDeviceAsArray() throws Exception {
+        RackArrayImpl rackPartly = new RackArrayImpl(6, Battery.class);
+        Battery battery1 = new Battery();
+        battery1.setIn(1);
+        Battery battery2 = new Battery();
+        battery2.setIn(2);
+        Battery battery3 = new Battery();
+        battery3.setIn(3);
+        Battery battery4 = new Battery();
+        battery4.setIn(4);
+        Device[] devicesForRackPartly = new Device[] {battery1, battery4, battery2, battery4, null, battery3};
+        int counter = 0;
+        for (Device device: devicesForRackPartly ) {
+            if (device != null) {
+                rackPartly.insertDevToSlot(device, counter++);
+            }
+        }
+        Device[] expResult = new Device[] {battery1, battery2, battery3, battery4, battery4};
+        int expSize = 5;
+
+        Device[] result = rackPartly.getAllDeviceAsArray();
+
+        new ServiceImpl().sortByIN(result);
+        assertEquals(expSize, result.length);
+        assertArrayEquals(expResult, result);
+    }
+
 
 }

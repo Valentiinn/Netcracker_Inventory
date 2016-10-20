@@ -14,7 +14,7 @@ public class RackArrayImpl implements Rack {
     private final Class clazz;
     private Device[] devices;
     @Deprecated
-    private String type;
+    protected String type;
 
 
     @Deprecated
@@ -25,7 +25,7 @@ public class RackArrayImpl implements Rack {
             LOGGER.log(Level.WARNING, "Device type for the rack set as null");
         }
         this.type = type;
-        devices = new Device[size];
+        this.devices = new Device[size];
         clazz = Device.class;
     }
 
@@ -71,10 +71,7 @@ public class RackArrayImpl implements Rack {
             LOGGER.log(Level.SEVERE, "Correctly add a device", e);
             throw e;
         }
-        if (devices[index] != null) {
-            return false;
-        }
-        if (!type.equals(device.getType())) {
+        if ((type != null && !type.equals(device.getType())) || getDevAtSlot(index) != null || !clazz.isInstance(device)) {
             return false;
         }
         devices[index] = device;
@@ -139,5 +136,10 @@ public class RackArrayImpl implements Rack {
         } else {
             this.devices = new Device[size];
         }
+    }
+
+    @Deprecated
+    public String getType() {
+        return type;
     }
 }

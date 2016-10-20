@@ -11,9 +11,9 @@ public interface DeviceService {
      * Method check device for castability to specified type
      *
      * @param device - checked device
-     * @param clazz - type for cast
+     * @param clazz  - type for cast
      * @return true - if device is castable
-     *         false - if device is not castable
+     * false - if device is not castable
      */
     boolean isCastableTo(Device device, Class clazz);
 
@@ -22,9 +22,9 @@ public interface DeviceService {
      *
      * @param device - validated device
      * @return true - if device is valid
-     *         false - if device is not valid
+     * false - if device is not valid
      */
-    DeviceService isValidDeviceForInsertToRack(Device device);
+    boolean isValidDeviceForInsertToRack(Device device);
 
 
 }
