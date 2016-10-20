@@ -6,7 +6,7 @@ import com.netcracker.edu.inventory.service.DeviceService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DeviceServiceImpl implements DeviceService {
+class DeviceServiceImpl implements DeviceService {
 
     static protected Logger LOGGER = Logger.getLogger(DeviceServiceImpl.class.getName());
 

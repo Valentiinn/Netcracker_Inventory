@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class AbstractDevice implements Device {
+    abstract class AbstractDevice implements Device {
 
     protected int in;
     protected final String type = getClass().getSimpleName();
