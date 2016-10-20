@@ -34,7 +34,7 @@ public abstract class AbstractDevice implements Device {
     @Deprecated
     @Override
     public void setType(String type) {
-        LOGGER.log(Level.WARNING, "<setType(String)> method was marked as deprecated.");
+        LOGGER.log(Level.WARNING, "<setType(String)> method was marked as deprecated");
     }
 
     @Override
