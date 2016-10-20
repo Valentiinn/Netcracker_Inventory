@@ -9,16 +9,12 @@ import java.util.logging.Logger;
 public abstract class AbstractDevice implements Device {
 
     protected int in;
-    protected final String type;
+    protected final String type = getClass().getSimpleName();
     protected String manufacturer;
     protected String model;
     protected Date productionDate;
 
     static protected Logger LOGGER = Logger.getLogger(AbstractDevice.class.getName());
-
-    public AbstractDevice() {
-        this.type = this.getClass().getSimpleName();
-    }
 
     @Override
     public int getIn() {

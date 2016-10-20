@@ -4,29 +4,41 @@ import com.netcracker.edu.inventory.exception.DeviceValidationException;
 import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.model.Rack;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class RackArrayImpl implements Rack {
 
     static protected Logger LOGGER = Logger.getLogger(RackArrayImpl.class.getName());
+    private final Class clazz;
+    private Device[] devices;
     @Deprecated
     private String type;
-    private Device[] devices;
+
 
     @Deprecated
     public RackArrayImpl(int size, String type) {
-//        if (size < 0) {
-//            IllegalArgumentException e = new IllegalArgumentException("Rack size should not be negative");
-//            LOGGER.log(Level.SEVERE, "Incorrect rack size", e);
-//            throw e;
-//        }
-//        if (type == null) {
-//            LOGGER.log(Level.WARNING, "Device type for the rack set as null");
-//        }
-//        this.type = type;
-//        devices = new Device[size];
-        LOGGER.log(Level.WARNING, "<RackArrayImpl(int size, String type)> constructor was marked as deprecated.");
+        LOGGER.log(Level.WARNING, "<RackArrayImpl(int,String)> constructor was marked as deprecated.");
+        setRackSize(size);
+        if (type == null) {
+            LOGGER.log(Level.WARNING, "Device type for the rack set as null");
+        }
+        this.type = type;
+        devices = new Device[size];
+        clazz = Device.class;
+    }
+
+    public RackArrayImpl(int size, Class clazz) {
+        setRackSize(size);
+        if (clazz == null) {
+            IllegalArgumentException e = new IllegalArgumentException("Device class should not be null");
+            LOGGER.log(Level.SEVERE, "Invalid device class.", e);
+            throw e;
+        }
+
+        devices = new Device[size];
+        this.clazz = clazz;
     }
 
     @Override
@@ -93,7 +105,18 @@ public class RackArrayImpl implements Rack {
 
     @Override
     public Device[] getAllDeviceAsArray() {
-        return new Device[0];
+        ArrayList<Device> list = new ArrayList<Device>();
+
+        for (int i = 0; i < devices.length; i++) {
+            if (devices[i] != null) {
+                list.add(devices[i]);
+            }
+        }
+
+        Device[] result = new Device[list.size()];
+        list.toArray(result);
+
+        return result;
     }
 
     private void checkIndexLimit(int index) {
@@ -104,6 +127,17 @@ public class RackArrayImpl implements Rack {
 
             LOGGER.log(Level.SEVERE, "Invalid slot index.", e);
             throw e;
+        }
+    }
+
+    private void setRackSize(int size) {
+
+        if (size < 0) {
+            IllegalArgumentException e = new IllegalArgumentException("Rack size should not be negative");
+            LOGGER.log(Level.SEVERE, "Incorrect rack size", e);
+            throw e;
+        } else {
+            this.devices = new Device[size];
         }
     }
 }
