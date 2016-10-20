@@ -24,7 +24,7 @@ public interface DeviceService {
      * @return true - if device is valid
      *         false - if device is not valid
      */
-    boolean isValidDeviceForInsertToRack(Device device);
+    DeviceService isValidDeviceForInsertToRack(Device device);
 
 
 }
