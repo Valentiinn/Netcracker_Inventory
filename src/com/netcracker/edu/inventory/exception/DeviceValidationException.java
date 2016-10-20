@@ -4,18 +4,18 @@ import com.netcracker.edu.inventory.model.Device;
 
 public class DeviceValidationException extends RuntimeException {
 
-    private Object notValidDevice;
+    private Device notValidDevice;
 
-    public DeviceValidationException(String massage, Object notValidDevice) {
-        super("Device is not valid for operation");
+    public DeviceValidationException(String massage, Device notValidDevice) {
+        super("Device is not valid for operation" + massage);
         this.notValidDevice = notValidDevice;
     }
 
-    public Object getNotValidDevice() {
+    public Device getNotValidDevice() {
         return notValidDevice;
     }
 
-    public void setNotValidDevice(Object notValidDevice) {
+    public void setNotValidDevice(Device notValidDevice) {
         this.notValidDevice = notValidDevice;
     }
 }

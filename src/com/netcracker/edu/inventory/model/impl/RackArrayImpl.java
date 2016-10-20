@@ -10,19 +10,23 @@ import java.util.logging.Logger;
 public class RackArrayImpl implements Rack {
 
     static protected Logger LOGGER = Logger.getLogger(RackArrayImpl.class.getName());
+    @Deprecated
     private String type;
     private Device[] devices;
 
+    @Deprecated
     public RackArrayImpl(int size, String type) {
-        if (size < 0) {
-            IllegalArgumentException e = new IllegalArgumentException("Rack size should not be negative");
-            throw e;
-        }
-        if (type == null) {
-            LOGGER.log(Level.WARNING, "Device type for the rack set as null");
-        }
-        this.type = type;
-        devices = new Device[size];
+//        if (size < 0) {
+//            IllegalArgumentException e = new IllegalArgumentException("Rack size should not be negative");
+//            LOGGER.log(Level.SEVERE, "Incorrect rack size", e);
+//            throw e;
+//        }
+//        if (type == null) {
+//            LOGGER.log(Level.WARNING, "Device type for the rack set as null");
+//        }
+//        this.type = type;
+//        devices = new Device[size];
+        LOGGER.log(Level.WARNING, "<RackArrayImpl(int size, String type)> constructor was marked as deprecated.");
     }
 
     @Override
@@ -85,6 +89,11 @@ public class RackArrayImpl implements Rack {
             }
         }
         return null;
+    }
+
+    @Override
+    public Device[] getAllDeviceAsArray() {
+        return new Device[0];
     }
 
     private void checkIndexLimit(int index) {

@@ -9,6 +9,13 @@ import com.netcracker.edu.inventory.model.Device;
 public interface Service {
 
     /**
+     * Return DeviceService implementation
+     *
+     * @return implementation of DeviceService interface
+     */
+    DeviceService getDeviceService();
+
+    /**
      * Sort array of Device-s by identification number.
      *
      * @param devices - array of Device-s, that need to be sorted

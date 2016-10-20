@@ -3,14 +3,22 @@ package com.netcracker.edu.inventory.model.impl;
 import com.netcracker.edu.inventory.model.Device;
 
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class AbstractDevice implements Device {
 
     protected int in;
-    protected String type;
+    protected final String type;
     protected String manufacturer;
     protected String model;
     protected Date productionDate;
+
+    static protected Logger LOGGER = Logger.getLogger(AbstractDevice.class.getName());
+
+    public AbstractDevice() {
+        this.type = this.getClass().getSimpleName();
+    }
 
     @Override
     public int getIn() {
@@ -28,8 +36,9 @@ public abstract class AbstractDevice implements Device {
     }
 
     @Override
+    @Deprecated
     public void setType(String type) {
-        this.type = type;
+        LOGGER.log(Level.WARNING, "<setType(String)> method was marked as deprecated.");
     }
 
     @Override

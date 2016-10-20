@@ -30,6 +30,7 @@ public interface Rack {
 
     /**
      * Insert device object to specified slot of rack
+     * Can't insert to full slot
      *
      * @param index - index of slot
      * @return true - if devicw was inserted
@@ -54,4 +55,12 @@ public interface Rack {
      *         null - if it is absent in rack
      */
     Device getDevByIN(int in);
+
+    /**
+     * Get array of devices witch are stored at current object of Rack
+     * Returned array not include nulls.
+     *
+     * @return array of devices
+     */
+    Device[] getAllDeviceAsArray();
 }
