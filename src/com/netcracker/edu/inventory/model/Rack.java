@@ -20,12 +20,19 @@ public interface Rack {
     int getFreeSize();
 
     /**
+     *
+     * @return type of devices, which compatible with this rack
+     */
+    Class getTypeOfDevices();
+
+    /**
      * Get device object at specified slot of rack
      *
      * @param index - index of slot
      * @return device object at slot - if slot are full
      *         null - if slot are empty
      */
+
     Device getDevAtSlot(int index);
 
     /**

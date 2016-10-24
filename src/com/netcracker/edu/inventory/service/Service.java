@@ -16,6 +16,13 @@ public interface Service {
     DeviceService getDeviceService();
 
     /**
+     * Return RackService implementation
+     *
+     * @return implementation of RackService interface
+     */
+    RackService getRackService();
+
+    /**
      * Sort array of Device-s by identification number.
      *
      * @param devices - array of Device-s, that need to be sorted
@@ -29,4 +36,5 @@ public interface Service {
      * @param type - type of Devices, that will remain in the array after filtering
      */
     void filtrateByType(Device[] devices, String type);
+
 }

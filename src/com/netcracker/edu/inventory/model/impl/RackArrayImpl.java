@@ -58,6 +58,11 @@ public class RackArrayImpl implements Rack {
     }
 
     @Override
+    public Class getTypeOfDevices() {
+        return clazz;
+    }
+
+    @Override
     public Device getDevAtSlot(int index) {
         checkIndexLimit(index);
         return devices[index];
