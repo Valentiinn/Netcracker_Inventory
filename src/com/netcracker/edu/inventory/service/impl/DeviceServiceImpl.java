@@ -50,15 +50,34 @@ class DeviceServiceImpl implements DeviceService {
             throw e;
         }
         DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+        String massage = "null";
         if (device != null) {
-            String massage = "null";
             dataOutputStream.writeUTF(device.getClass().getName());
             dataOutputStream.writeInt(device.getIn());
             dataOutputStream.writeUTF(device.getType());
-            dataOutputStream.writeUTF(device.getModel() == null ? "null" : device.getModel());
-            dataOutputStream.writeUTF(device.getManufacturer() == null ? "null" : device.getManufacturer());
+            dataOutputStream.writeUTF(device.getModel() == null ? massage : device.getModel());
+            dataOutputStream.writeUTF(device.getManufacturer() == null ? massage : device.getManufacturer());
             dataOutputStream.writeLong(device.getProductionDate() == null ? (long) -1 : (long) device.getProductionDate().getTime());
         }
+        if (device instanceof Switch) {
+            Switch aSwitch = (Switch) device;
+            dataOutputStream.writeInt(aSwitch.getNumberOfPorts());
+        }
+
+        if (device instanceof Router) {
+            Router router = (Router) device;
+            dataOutputStream.writeInt(router.getDataRate());
+        }
+        if (device instanceof Battery) {
+            Battery battery = (Battery) device;
+            dataOutputStream.writeInt(battery.getChargeVolume());
+        }
+        if (device instanceof WifiRouter) {
+            WifiRouter wifiRouter = (WifiRouter) device;
+            dataOutputStream.writeUTF(wifiRouter.getSecurityProtocol() == null ? massage : wifiRouter.getSecurityProtocol());
+        }
+
+
     }
 
     @Override
