@@ -13,10 +13,10 @@ public class Main {
             System.err.println("Could not setup logger configuration: " + e.toString());
         }
     }
-    public static void print(String[] args) {
-        for (String line : args) {
-            System.out.println(line);
-        }
-        System.out.println();
-    }
+//    public static void print(String[] args) {
+//        for (String line : args) {
+//            System.out.println(line);
+//        }
+//        System.out.println();
+//    }
 }
