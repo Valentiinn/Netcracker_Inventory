@@ -174,6 +174,27 @@ public class RackArrayImplTest {
     }
 
     @Test
+    public void getTypeOfDevices() throws Exception {
+        Rack rackDevice = new RackArrayImpl(2, Device.class);
+        Rack rackBattery = new RackArrayImpl(2, Battery.class);
+        Rack rackRouter = new RackArrayImpl(2, Router.class);
+        Rack rackWifiRouter = new RackArrayImpl(2, WifiRouter.class);
+        Rack rackSwitch = new RackArrayImpl(2, Switch.class);
+
+        Class result1 = rackDevice.getTypeOfDevices();
+        Class result2 = rackBattery.getTypeOfDevices();
+        Class result3 = rackRouter.getTypeOfDevices();
+        Class result4 = rackWifiRouter.getTypeOfDevices();
+        Class result5 = rackSwitch.getTypeOfDevices();
+
+        assertEquals(Device.class, result1);
+        assertEquals(Battery.class, result2);
+        assertEquals(Router.class, result3);
+        assertEquals(WifiRouter.class, result4);
+        assertEquals(Switch.class, result5);
+    }
+
+    @Test
     public void getFreeSize() throws Exception {
         int rackSize = 10;
         RackArrayImpl rackForWoodpecker = new RackArrayImpl(rackSize, "Battery");

@@ -6,6 +6,7 @@ import com.netcracker.edu.inventory.model.impl.Router;
 import com.netcracker.edu.inventory.model.impl.Switch;
 import com.netcracker.edu.inventory.model.impl.WifiRouter;
 import com.netcracker.edu.inventory.service.DeviceService;
+import com.netcracker.edu.inventory.service.RackService;
 import com.netcracker.edu.inventory.service.Service;
 import org.junit.After;
 import org.junit.Before;
@@ -38,6 +39,13 @@ public class ServiceImplTest {
         DeviceService deviceService = service.getDeviceService();
 
         assertNotNull(deviceService);
+    }
+
+    @Test
+    public void getRackService() throws Exception {
+        RackService rackService = service.getRackService();
+
+        assertNotNull(rackService);
     }
 
     @Test

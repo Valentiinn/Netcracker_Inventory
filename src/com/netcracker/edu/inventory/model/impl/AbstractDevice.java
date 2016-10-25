@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-    abstract class AbstractDevice implements Device {
+abstract class AbstractDevice implements Device {
 
     protected int in;
     protected final String type = getClass().getSimpleName();
@@ -23,6 +23,11 @@ import java.util.logging.Logger;
 
     @Override
     public void setIn(int in) {
+        if (in <= 0) {
+            IllegalArgumentException e = new IllegalArgumentException("in should not be less than 0");
+            LOGGER.log(Level.SEVERE, "In  parameter  should not be less than  0");
+            throw e;
+        }
         this.in = in;
     }
 

@@ -50,75 +50,75 @@ class DeviceServiceImpl implements DeviceService {
 
     @Override
     public void outputDevice(Device device, OutputStream outputStream) throws IOException {
-        if (outputStream == null) {
-            IllegalArgumentException e = new IllegalArgumentException("OutputStream should not be null");
-            LOGGER.log(Level.SEVERE, "OutputStream should not be null", e);
-            throw e;
-        }
-        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
-        String massage = "null";
-        if (device != null) {
-            dataOutputStream.writeUTF(device.getClass().getName());
-            dataOutputStream.writeInt(device.getIn());
-            dataOutputStream.writeUTF(device.getType());
-            dataOutputStream.writeUTF(device.getModel() == null ? massage : device.getModel());
-            dataOutputStream.writeUTF(device.getManufacturer() == null ? massage : device.getManufacturer());
-            dataOutputStream.writeLong(device.getProductionDate() == null ? (long) -1 : (long) device.getProductionDate().getTime());
-        }
-        if (device instanceof Switch) {
-            Switch aSwitch = (Switch) device;
-            dataOutputStream.writeInt(aSwitch.getNumberOfPorts());
+        if (device == null) {
+            return;
         }
 
-        if (device instanceof Router) {
-            Router router = (Router) device;
-            dataOutputStream.writeInt(router.getDataRate());
+        if (outputStream == null) {
+            IllegalArgumentException illegalArgumentException = new IllegalArgumentException("OutputStream cannot be null");
+            LOGGER.log(Level.SEVERE, "Thrown exception", illegalArgumentException);
+            throw illegalArgumentException;
         }
-        if (device instanceof Battery) {
+
+        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+        dataOutputStream.writeUTF(device.getClass().getName());
+        dataOutputStream.writeInt(device.getIn());
+        dataOutputStream.writeUTF(device.getType());
+        dataOutputStream.writeUTF(device.getModel() == null ? "\n" : device.getModel());
+        dataOutputStream.writeUTF(device.getManufacturer() == null ? "\n" : device.getManufacturer());
+        dataOutputStream.writeLong(device.getProductionDate() == null ? -1 : device.getProductionDate().getTime());
+
+        if (Battery.class.isInstance(device)) {
             Battery battery = (Battery) device;
             dataOutputStream.writeInt(battery.getChargeVolume());
         }
-        if (device instanceof WifiRouter) {
-            WifiRouter wifiRouter = (WifiRouter) device;
-            dataOutputStream.writeUTF(wifiRouter.getSecurityProtocol() == null ? massage : wifiRouter.getSecurityProtocol());
+        if (Router.class.isInstance(device)) {
+            Router router = (Router) device;
+            dataOutputStream.writeInt(router.getDataRate());
         }
+        if (Switch.class.isInstance(device)) {
+            Switch aSwitch = (Switch) device;
+            dataOutputStream.writeInt(aSwitch.getNumberOfPorts());
+        }
+        if (WifiRouter.class.isInstance(device)) {
+            WifiRouter wifiRouter = (WifiRouter) device;
+            dataOutputStream.writeUTF(wifiRouter.getSecurityProtocol() == null ? "\n" : wifiRouter.getSecurityProtocol());
+        }
+
+
     }
 
     @Override
     public Device inputDevice(InputStream inputStream) throws IOException, ClassNotFoundException {
-        String massage = "null";
         if (inputStream == null) {
-            IllegalArgumentException e = new IllegalArgumentException("inputStream should not be null");
-            LOGGER.log(Level.SEVERE, "InputStream should not be null", e);
-            throw e;
+            IllegalArgumentException illegalArgumentException = new IllegalArgumentException("InputStream cannot be null");
+            LOGGER.log(Level.SEVERE, "InputStream cannot be null", illegalArgumentException);
+            throw illegalArgumentException;
         }
+
         DataInputStream dataInputStream = new DataInputStream(inputStream);
-        String className = dataInputStream.readUTF();
-        Class clazz = Class.forName(className);
-        if (clazz.isInstance(new Switch())) {
-            Switch swtch = new Switch();
+        Class clazz = Class.forName(dataInputStream.readUTF());
+        if (clazz.isInstance(new Battery())) {
+            Battery battery = new Battery();
 
             int in = dataInputStream.readInt();
             String type = dataInputStream.readUTF(dataInputStream);
             String module = dataInputStream.readUTF(dataInputStream);
             String manufacturer = dataInputStream.readUTF(dataInputStream);
             long productionDate = dataInputStream.readLong();
-            int dateRate = dataInputStream.readInt();
-            int numberOfPorts = dataInputStream.readInt();
+            int chargeVolume = dataInputStream.readInt();
 
             if (in > 0) {
-                swtch.setIn(in);
+                battery.setIn(in);
             }
 
-            swtch.setType(type);
-            swtch.setModel(module.equals(massage) ? null : module);
-            swtch.setManufacturer(manufacturer.equals(massage) ? null : manufacturer);
-            swtch.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
-            swtch.setDataRate(dateRate);
-            swtch.setNumberOfPorts(numberOfPorts);
+            battery.setType(type);
+            battery.setModel(module.equals("\n") ? null : module);
+            battery.setManufacturer(manufacturer.equals("\n") ? null : manufacturer);
+            battery.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
+            battery.setChargeVolume(chargeVolume);
 
-            return swtch;
-
+            return battery;
         }
         if (clazz.isInstance(new Router())) {
             Router router = new Router();
@@ -135,39 +135,39 @@ class DeviceServiceImpl implements DeviceService {
             }
 
             router.setType(type);
-            router.setModel(module.equals(massage) ? null : module);
-            router.setManufacturer(manufacturer.equals(massage) ? null : manufacturer);
+            router.setModel(module.equals("\n") ? null : module);
+            router.setManufacturer(manufacturer.equals("\n") ? null : manufacturer);
+            router.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
             router.setDataRate(dateRate);
 
             return router;
 
         }
-        if (clazz.isInstance(new Battery())) {
-            Battery battery = new Battery();
-
+        if (clazz.isInstance(new Switch())) {
+            Switch switcher = new Switch();
             int in = dataInputStream.readInt();
             String type = dataInputStream.readUTF(dataInputStream);
             String module = dataInputStream.readUTF(dataInputStream);
             String manufacturer = dataInputStream.readUTF(dataInputStream);
             long productionDate = dataInputStream.readLong();
-            int chargeVolume = dataInputStream.readInt();
+            int dateRate = dataInputStream.readInt();
+            int numberOfPorts = dataInputStream.readInt();
 
             if (in > 0) {
-                battery.setIn(in);
+                switcher.setIn(in);
             }
 
-            battery.setType(type);
-            battery.setModel(module.equals(massage) ? null : module);
-            battery.setManufacturer(manufacturer.equals(massage) ? null : manufacturer);
-            battery.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
-            battery.setChargeVolume(chargeVolume);
-
-            return battery;
+            switcher.setType(type);
+            switcher.setModel(module.equals("\n") ? null : module);
+            switcher.setManufacturer(manufacturer.equals("\n") ? null : manufacturer);
+            switcher.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
+            switcher.setDataRate(dateRate);
+            switcher.setNumberOfPorts(numberOfPorts);
+            return switcher;
 
         }
         if (clazz.isInstance(new WifiRouter())) {
             WifiRouter wifiRouter = new WifiRouter();
-
             int in = dataInputStream.readInt();
             String type = dataInputStream.readUTF(dataInputStream);
             String module = dataInputStream.readUTF(dataInputStream);
@@ -181,12 +181,11 @@ class DeviceServiceImpl implements DeviceService {
             }
 
             wifiRouter.setType(type);
-            wifiRouter.setModel(module.equals(massage) ? null : module);
-            wifiRouter.setManufacturer(manufacturer.equals(massage) ? null : manufacturer);
+            wifiRouter.setModel(module.equals("\n") ? null : module);
+            wifiRouter.setManufacturer(manufacturer.equals("\n") ? null : manufacturer);
             wifiRouter.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
             wifiRouter.setDataRate(dateRate);
-            wifiRouter.setSecurityProtocol(securityProtocol.equals(massage) ? null : securityProtocol);
-
+            wifiRouter.setSecurityProtocol(securityProtocol.equals("\n") ? null : securityProtocol);
             return wifiRouter;
         }
         return null;

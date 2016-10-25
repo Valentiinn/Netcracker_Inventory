@@ -17,7 +17,9 @@ public class AbstractDeviceTest {
 
     Device device;
 
-    int in = 0;
+    int in0 = 0;
+    int in5 = 5;
+    int inm3 = -3;
     String type = "";
     String manufacturer = "";
     String model = "";
@@ -35,10 +37,20 @@ public class AbstractDeviceTest {
 
     @Test
     public void setGetIn() throws Exception {
-        device.setIn(in);
+        device.setIn(in5);
         int result = device.getIn();
 
-        assertEquals(in, result);
+        assertEquals(in5, result);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setIn0() throws Exception {
+        device.setIn(in0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setInNegative() throws Exception {
+        device.setIn(inm3);
     }
 
     @Deprecated
