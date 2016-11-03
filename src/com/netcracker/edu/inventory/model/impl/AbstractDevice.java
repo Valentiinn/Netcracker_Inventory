@@ -2,11 +2,12 @@ package com.netcracker.edu.inventory.model.impl;
 
 import com.netcracker.edu.inventory.model.Device;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-abstract class AbstractDevice implements Device {
+abstract class AbstractDevice implements Device,Serializable {
 
     protected int in;
     protected final String type = getClass().getSimpleName();

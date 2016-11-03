@@ -24,7 +24,7 @@ public interface RackService {
      * @param reader - source symbol stream
      * @return - received Rack instance
      */
-    Rack readRack(Reader reader) throws IOException;
+    Rack readRack(Reader reader) throws IOException, ClassNotFoundException;
 
     /**
      * Write Rack instance in to binary stream
@@ -56,6 +56,6 @@ public interface RackService {
      * @param inputStream - source binary stream
      * @return - received Rack instance
      */
-    Rack deserializeRack(InputStream inputStream) throws IOException, ClassCastException;
+    Rack deserializeRack(InputStream inputStream) throws IOException, ClassCastException, ClassNotFoundException;
 
 }

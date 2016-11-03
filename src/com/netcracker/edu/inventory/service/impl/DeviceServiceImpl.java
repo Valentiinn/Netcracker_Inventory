@@ -1,12 +1,12 @@
 package com.netcracker.edu.inventory.service.impl;
 
+import com.netcracker.edu.inventory.exception.DeviceValidationException;
 import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.model.impl.Battery;
 import com.netcracker.edu.inventory.model.impl.Router;
 import com.netcracker.edu.inventory.model.impl.Switch;
 import com.netcracker.edu.inventory.model.impl.WifiRouter;
 import com.netcracker.edu.inventory.service.DeviceService;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
 import java.util.Date;
@@ -35,20 +35,6 @@ class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public void writeDevice(Device device, Writer writer) throws IOException {
-        NotImplementedException e = new NotImplementedException();
-        LOGGER.log(Level.SEVERE, "Operation writeDevice not supported yet");
-        throw e;
-    }
-
-    @Override
-    public Device readDevice(Reader reader) throws IOException, ClassNotFoundException {
-        NotImplementedException e = new NotImplementedException();
-        LOGGER.log(Level.SEVERE, "Operation readDevice not supported yet");
-        throw e;
-    }
-
-    @Override
     public void outputDevice(Device device, OutputStream outputStream) throws IOException {
         if (device == null) {
             return;
@@ -56,7 +42,7 @@ class DeviceServiceImpl implements DeviceService {
 
         if (outputStream == null) {
             IllegalArgumentException illegalArgumentException = new IllegalArgumentException("OutputStream cannot be null");
-            LOGGER.log(Level.SEVERE, "Thrown exception", illegalArgumentException);
+            LOGGER.log(Level.SEVERE, illegalArgumentException.getMessage(), illegalArgumentException);
             throw illegalArgumentException;
         }
 
@@ -92,7 +78,7 @@ class DeviceServiceImpl implements DeviceService {
     public Device inputDevice(InputStream inputStream) throws IOException, ClassNotFoundException {
         if (inputStream == null) {
             IllegalArgumentException illegalArgumentException = new IllegalArgumentException("InputStream cannot be null");
-            LOGGER.log(Level.SEVERE, "InputStream cannot be null", illegalArgumentException);
+            LOGGER.log(Level.SEVERE, illegalArgumentException.getMessage(), illegalArgumentException);
             throw illegalArgumentException;
         }
 
@@ -100,67 +86,24 @@ class DeviceServiceImpl implements DeviceService {
         Class clazz = Class.forName(dataInputStream.readUTF());
         if (clazz.isInstance(new Battery())) {
             Battery battery = new Battery();
-
-            int in = dataInputStream.readInt();
-            String type = dataInputStream.readUTF(dataInputStream);
-            String module = dataInputStream.readUTF(dataInputStream);
-            String manufacturer = dataInputStream.readUTF(dataInputStream);
-            long productionDate = dataInputStream.readLong();
+            battery = (Battery) this.setDevValues(battery, dataInputStream);
             int chargeVolume = dataInputStream.readInt();
-
-            if (in > 0) {
-                battery.setIn(in);
-            }
-
-            battery.setType(type);
-            battery.setModel(module.equals("\n") ? null : module);
-            battery.setManufacturer(manufacturer.equals("\n") ? null : manufacturer);
-            battery.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
             battery.setChargeVolume(chargeVolume);
-
             return battery;
         }
         if (clazz.isInstance(new Router())) {
             Router router = new Router();
-
-            int in = dataInputStream.readInt();
-            String type = dataInputStream.readUTF(dataInputStream);
-            String module = dataInputStream.readUTF(dataInputStream);
-            String manufacturer = dataInputStream.readUTF(dataInputStream);
-            long productionDate = dataInputStream.readLong();
+            router = (Router) this.setDevValues(router, dataInputStream);
             int dateRate = dataInputStream.readInt();
-
-            if (in > 0) {
-                router.setIn(in);
-            }
-
-            router.setType(type);
-            router.setModel(module.equals("\n") ? null : module);
-            router.setManufacturer(manufacturer.equals("\n") ? null : manufacturer);
-            router.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
             router.setDataRate(dateRate);
-
             return router;
 
         }
         if (clazz.isInstance(new Switch())) {
             Switch switcher = new Switch();
-            int in = dataInputStream.readInt();
-            String type = dataInputStream.readUTF(dataInputStream);
-            String module = dataInputStream.readUTF(dataInputStream);
-            String manufacturer = dataInputStream.readUTF(dataInputStream);
-            long productionDate = dataInputStream.readLong();
+            switcher = (Switch) this.setDevValues(switcher, dataInputStream);
             int dateRate = dataInputStream.readInt();
             int numberOfPorts = dataInputStream.readInt();
-
-            if (in > 0) {
-                switcher.setIn(in);
-            }
-
-            switcher.setType(type);
-            switcher.setModel(module.equals("\n") ? null : module);
-            switcher.setManufacturer(manufacturer.equals("\n") ? null : manufacturer);
-            switcher.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
             switcher.setDataRate(dateRate);
             switcher.setNumberOfPorts(numberOfPorts);
             return switcher;
@@ -168,22 +111,9 @@ class DeviceServiceImpl implements DeviceService {
         }
         if (clazz.isInstance(new WifiRouter())) {
             WifiRouter wifiRouter = new WifiRouter();
-            int in = dataInputStream.readInt();
-            String type = dataInputStream.readUTF(dataInputStream);
-            String module = dataInputStream.readUTF(dataInputStream);
-            String manufacturer = dataInputStream.readUTF(dataInputStream);
-            long productionDate = dataInputStream.readLong();
+            wifiRouter = (WifiRouter) this.setDevValues(wifiRouter, dataInputStream);
             int dateRate = dataInputStream.readInt();
             String securityProtocol = dataInputStream.readUTF();
-
-            if (in > 0) {
-                wifiRouter.setIn(in);
-            }
-
-            wifiRouter.setType(type);
-            wifiRouter.setModel(module.equals("\n") ? null : module);
-            wifiRouter.setManufacturer(manufacturer.equals("\n") ? null : manufacturer);
-            wifiRouter.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
             wifiRouter.setDataRate(dateRate);
             wifiRouter.setSecurityProtocol(securityProtocol.equals("\n") ? null : securityProtocol);
             return wifiRouter;
@@ -191,17 +121,226 @@ class DeviceServiceImpl implements DeviceService {
         return null;
     }
 
+
     @Override
     public void serializeDevice(Device device, OutputStream outputStream) throws IOException {
-        NotImplementedException e = new NotImplementedException();
-        LOGGER.log(Level.SEVERE, "Operation serializeDevice not supported yet");
-        throw e;
+        if (device == null) {
+            return;
+        }
+
+        if (outputStream == null) {
+            IllegalArgumentException e = new IllegalArgumentException("OutputStream can't be null");
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
+        }
+
+        ObjectOutputStream out = new ObjectOutputStream(outputStream);
+        out.writeObject(device);
     }
 
     @Override
-    public Device deserializeDevice(InputStream inputStream) throws IOException, ClassCastException {
-        NotImplementedException e = new NotImplementedException();
-        LOGGER.log(Level.SEVERE, "Operation deserializeDevice not supported yet");
+    public Device deserializeDevice(InputStream inputStream)
+            throws IOException, ClassCastException, ClassNotFoundException {
+        if (inputStream == null) {
+            IllegalArgumentException e = new IllegalArgumentException("InputStream can't be null");
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
+        }
+
+        ObjectInputStream in = new ObjectInputStream(inputStream);
+        Device device = (Device) in.readObject();
+
+        return device;
+    }
+
+    @Override
+    public boolean isValidDeviceForWriteToStream(Device device) {
+        if (device == null) {
+            return false;
+        }
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(device.getType());
+        builder.append(device.getModel());
+        builder.append(device.getManufacturer());
+
+        if (device instanceof WifiRouter) {
+            WifiRouter wifiRouter = (WifiRouter) device;
+            builder.append(wifiRouter.getSecurityProtocol());
+        }
+        if (builder.toString().contains("|")) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void writeDevice(Device device, Writer writer) throws IOException {
+        if (device == null) {
+            return;
+        }
+        if (writer == null) {
+            IllegalArgumentException e = new IllegalArgumentException("Writer can't be null");
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
+        }
+
+        if (!isValidDeviceForWriteToStream(device)) {
+            DeviceValidationException e = new DeviceValidationException("DeviceService.writeDevice", device);
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
+        }
+
+        BufferedWriter bufferedWriter = new BufferedWriter(writer);
+        DeviceService deviceService = new DeviceServiceImpl();
+
+        bufferedWriter.write(device.getClass().getName());
+        bufferedWriter.write("\n");
+        bufferedWriter.write("[" + device.getIn() + "] ");
+        bufferedWriter.write(device.getType() + " |");
+        bufferedWriter.write(device.getModel() == null ? " |" : " " + device.getModel() + " |");
+        bufferedWriter.write(device.getManufacturer() == null ? " |" : " " + device.getManufacturer() + " |");
+        bufferedWriter.write(device.getProductionDate() == null ? " -1 |" : " " + device.getProductionDate().getTime() + " |");
+
+
+        if (deviceService.isCastableTo(device, Battery.class)) {
+            bufferedWriter.write(" " + ((Battery) device).getChargeVolume() + " |");
+        }
+
+        if (deviceService.isCastableTo(device, Router.class)) {
+            bufferedWriter.write(" " + ((Router) device).getDataRate() + " |");
+        }
+
+        if (deviceService.isCastableTo(device, WifiRouter.class)) {
+            String securityProtocol = ((WifiRouter) device).getSecurityProtocol();
+            bufferedWriter.write(" " + securityProtocol == null ? " |" : securityProtocol + " |");
+        }
+
+        if (deviceService.isCastableTo(device, Switch.class)) {
+            bufferedWriter.write(" " + ((Switch) device).getNumberOfPorts() + " |");
+        }
+
+        bufferedWriter.write("\n");
+        bufferedWriter.flush();
+
+    }
+
+    @Override
+    public Device readDevice(Reader reader) throws IOException, ClassNotFoundException {
+        if (reader == null) {
+            IllegalArgumentException e = new IllegalArgumentException("Reader should not be null");
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
+        }
+        DeviceServiceImpl deviceService = new DeviceServiceImpl();
+
+        Class clazz = Class.forName(readNameOfClass(reader));
+
+        if (deviceService.isCastableTo(new Battery(), clazz)) {
+            Battery battery = new Battery();
+            addDefParametrsDevFromReader(battery, reader);
+            battery.setChargeVolume(Integer.valueOf(readNextValueFromReader(reader)));
+            reader.read();
+            return battery;
+        }
+
+        if (deviceService.isCastableTo(new Router(), clazz)) {
+            Router router = new Router();
+            addDefParametrsDevFromReader(router, reader);
+            router.setDataRate(Integer.valueOf(readNextValueFromReader(reader)));
+            reader.read();
+            return router;
+        }
+
+        if (deviceService.isCastableTo(new Switch(), clazz)) {
+            Switch aSwitch = new Switch();
+            addDefParametrsDevFromReader(aSwitch, reader);
+            aSwitch.setDataRate(Integer.valueOf(readNextValueFromReader(reader)));
+            aSwitch.setNumberOfPorts(Integer.valueOf(readNextValueFromReader(reader)));
+            reader.read();
+            return aSwitch;
+        }
+
+        if (deviceService.isCastableTo(new WifiRouter(), clazz)) {
+            WifiRouter wifiRouter = new WifiRouter();
+            addDefParametrsDevFromReader(wifiRouter, reader);
+            wifiRouter.setDataRate(Integer.valueOf(readNextValueFromReader(reader)));
+            String securityProtocol = readNextValueFromReader(reader);
+            wifiRouter.setSecurityProtocol(securityProtocol.isEmpty() ? " " : readNextValueFromReader(reader));
+            reader.read();
+            return wifiRouter;
+        }
+
+        ClassNotFoundException e = new ClassNotFoundException("Class not found");
+        LOGGER.log(Level.SEVERE, e.getMessage(), e);
         throw e;
+    }
+
+    private String readNameOfClass(Reader reader) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        char value;
+        boolean flag = true;
+        while (flag) {
+            value = (char) reader.read();
+            if (value == '\n') break;
+            stringBuilder.append(value);
+        }
+        return stringBuilder.toString();
+    }
+
+    private String readNextValueFromReader(Reader reader) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        char value;
+        reader.read();
+        boolean flag = true;
+        while (flag) {
+            value = (char) reader.read();
+            if (value == '|') break;
+            stringBuilder.append(value);
+        }
+        return stringBuilder.toString().trim();
+    }
+
+    private void addDefParametrsDevFromReader(Device device, Reader reader) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        char value;
+        reader.read();
+        boolean flag = true;
+        while (flag) {
+            value = (char) reader.read();
+            if (value == ']') break;
+            stringBuilder.append(value);
+        }
+        int in = Integer.parseInt(stringBuilder.toString());
+        if (in > 0) {
+            device.setIn(in);
+        }
+        device.setType(readNextValueFromReader(reader));
+
+        String model = readNextValueFromReader(reader);
+        String manufacturer = readNextValueFromReader(reader);
+        Long productionDate = Long.parseLong(readNextValueFromReader(reader));
+        if (model.isEmpty() == false)
+            device.setModel(model);
+        device.setManufacturer(manufacturer.isEmpty() == false ? manufacturer : "");
+        device.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
+    }
+
+    private Device setDevValues(Device device, DataInputStream dataInputStream) throws IOException {
+        int in = dataInputStream.readInt();
+        String type = dataInputStream.readUTF(dataInputStream);
+        String module = dataInputStream.readUTF(dataInputStream);
+        String manufacturer = dataInputStream.readUTF(dataInputStream);
+        long productionDate = dataInputStream.readLong();
+
+        if (in > 0) {
+            device.setIn(in);
+        }
+        device.setType(type);
+        device.setModel(module.equals("\n") ? null : module);
+        device.setManufacturer(manufacturer.equals("\n") ? null : manufacturer);
+        device.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
+
+        return device;
     }
 }

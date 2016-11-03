@@ -31,6 +31,15 @@ public interface DeviceService {
     boolean isValidDeviceForInsertToRack(Device device);
 
     /**
+     * Method check validity of device for write to char output stream
+     *
+     * @param device - validated device
+     * @return true - if device is valid
+     *         false - if device is not valid
+     */
+    boolean isValidDeviceForWriteToStream(Device device);
+
+    /**
      * Write Device instance in to symbol stream
      *
      * @param device - source Device
@@ -76,6 +85,6 @@ public interface DeviceService {
      * @param inputStream - source binary stream
      * @return - received Device instance
      */
-    Device deserializeDevice(InputStream inputStream) throws IOException, ClassCastException;
+    Device deserializeDevice(InputStream inputStream) throws IOException, ClassCastException, ClassNotFoundException;
 
 }

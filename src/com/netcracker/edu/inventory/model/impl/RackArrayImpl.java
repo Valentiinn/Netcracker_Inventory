@@ -4,11 +4,12 @@ import com.netcracker.edu.inventory.exception.DeviceValidationException;
 import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.model.Rack;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class RackArrayImpl implements Rack {
+public class RackArrayImpl implements Rack, Serializable {
 
     static protected Logger LOGGER = Logger.getLogger(RackArrayImpl.class.getName());
     private final Class clazz;

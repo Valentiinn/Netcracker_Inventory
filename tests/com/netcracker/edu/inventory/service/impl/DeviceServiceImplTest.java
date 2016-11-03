@@ -204,7 +204,7 @@ public class DeviceServiceImplTest {
     }
 
     @Test
-    public void outputInputDevice() throws Exception {
+    public void outputInputDevice2() throws Exception {
         PipedOutputStream pipedOutputStream = new PipedOutputStream();
         PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream);
         Battery battery = createBattery();
@@ -258,38 +258,38 @@ public class DeviceServiceImplTest {
         deviceService.inputDevice(null);
     }
 
-    @Test
-    public void serializeDeserializeDevice() throws Exception {
-        PipedOutputStream pipedOutputStream = new PipedOutputStream();
-        PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream, 2048);
-        Battery battery = createBattery();
-        Router router = createRouter();
-        Switch aSwitch = createSwitch();
-        WifiRouter wifiRouter = createWifiRouter();
-
-        deviceService.serializeDevice(battery, pipedOutputStream);
-        deviceService.serializeDevice(router, pipedOutputStream);
-        deviceService.serializeDevice(aSwitch, pipedOutputStream);
-        deviceService.serializeDevice(wifiRouter, pipedOutputStream);
-        pipedOutputStream.close();
-
-        Device result1 = deviceService.deserializeDevice(pipedInputStream);
-        Device result2 = deviceService.deserializeDevice(pipedInputStream);
-        Device result3 = deviceService.deserializeDevice(pipedInputStream);
-        Device result4 = deviceService.deserializeDevice(pipedInputStream);
-        pipedInputStream.close();
-
-        assertEquals(Battery.class, result1.getClass());
-        assertBattery(battery, (Battery) result1);
-        assertEquals(Router.class, result2.getClass());
-        assertRouter(router, (Router) result2);
-        assertEquals(Switch.class, result3.getClass());
-        assertSwitch(aSwitch, (Switch) result3);
-        assertEquals(WifiRouter.class, result4.getClass());
-        assertWifiRouter(wifiRouter, (WifiRouter) result4);
+//    @Test
+//    public void serializeDeserializeDevice() throws Exception {
+//        PipedOutputStream pipedOutputStream = new PipedOutputStream();
+//        PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream, 2048);
+//        Battery battery = createBattery();
+//        Router router = createRouter();
+//        Switch aSwitch = createSwitch();
+//        WifiRouter wifiRouter = createWifiRouter();
+//
+//        deviceService.serializeDevice(battery, pipedOutputStream);
+//        deviceService.serializeDevice(router, pipedOutputStream);
+//        deviceService.serializeDevice(aSwitch, pipedOutputStream);
+//        deviceService.serializeDevice(wifiRouter, pipedOutputStream);
+//        pipedOutputStream.close();
+//
+//        Device result1 = deviceService.deserializeDevice(pipedInputStream);
+//        Device result2 = deviceService.deserializeDevice(pipedInputStream);
+//        Device result3 = deviceService.deserializeDevice(pipedInputStream);
+//        Device result4 = deviceService.deserializeDevice(pipedInputStream);
+//        pipedInputStream.close();
+//
+//        assertEquals(Battery.class, result1.getClass());
+//        assertBattery(battery, (Battery) result1);
+//        assertEquals(Router.class, result2.getClass());
+//        assertRouter(router, (Router) result2);
+//        assertEquals(Switch.class, result3.getClass());
+//        assertSwitch(aSwitch, (Switch) result3);
+//        assertEquals(WifiRouter.class, result4.getClass());
+//        assertWifiRouter(wifiRouter, (WifiRouter) result4);
 
 //        serializeToFile("testOut.obj");
-    }
+//}
 
     @Test
     public void serializeDeviceNull() throws Exception {
