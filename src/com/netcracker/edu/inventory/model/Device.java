@@ -12,8 +12,6 @@ public interface Device {
     int getIn();
     void setIn(int in);
     String getType();
-    @Deprecated
-    void setType(String type);
     String getManufacturer();
     void setManufacturer(String manufacturer);
     String getModel();

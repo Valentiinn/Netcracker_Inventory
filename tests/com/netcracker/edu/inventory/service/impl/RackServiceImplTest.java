@@ -181,22 +181,26 @@ public class RackServiceImplTest {
         for (int i = 0; i < expRack.getSize(); i++) {
             Device expDevice = expRack.getDevAtSlot(i);
             Device device = rack.getDevAtSlot(i);
-            assertEquals(expDevice.getClass(), device.getClass());
-            if (expDevice.getClass() == Battery.class) {
-                DeviceServiceImplTest.assertBattery((Battery) expDevice, (Battery) device);
-                break;
-            }
-            if (expDevice.getClass() == Router.class) {
-                DeviceServiceImplTest.assertRouter((Router) expDevice, (Router) device);
-                break;
-            }
-            if (expDevice.getClass() == Switch.class) {
-                DeviceServiceImplTest.assertSwitch((Switch) expDevice, (Switch) device);
-                break;
-            }
-            if (expDevice.getClass() == WifiRouter.class) {
-                DeviceServiceImplTest.assertWifiRouter((WifiRouter) expDevice, (WifiRouter) device);
-                break;
+            if (expDevice == null) {
+                assertNull(device);
+            } else {
+                assertEquals(expDevice.getClass(), device.getClass());
+                if (expDevice.getClass() == Battery.class) {
+                    DeviceServiceImplTest.assertBattery((Battery) expDevice, (Battery) device);
+                    continue;
+                }
+                if (expDevice.getClass() == Router.class) {
+                    DeviceServiceImplTest.assertRouter((Router) expDevice, (Router) device);
+                    continue;
+                }
+                if (expDevice.getClass() == Switch.class) {
+                    DeviceServiceImplTest.assertSwitch((Switch) expDevice, (Switch) device);
+                    continue;
+                }
+                if (expDevice.getClass() == WifiRouter.class) {
+                    DeviceServiceImplTest.assertWifiRouter((WifiRouter) expDevice, (WifiRouter) device);
+                    continue;
+                }
             }
         }
     }

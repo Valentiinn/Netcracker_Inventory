@@ -14,21 +14,6 @@ public class RackArrayImpl implements Rack, Serializable {
     static protected Logger LOGGER = Logger.getLogger(RackArrayImpl.class.getName());
     private final Class clazz;
     private Device[] devices;
-    @Deprecated
-    protected String type;
-
-
-    @Deprecated
-    public RackArrayImpl(int size, String type) {
-        LOGGER.log(Level.WARNING, "<RackArrayImpl(int,String)> constructor was marked as deprecated.");
-        setRackSize(size);
-        if (type == null) {
-            LOGGER.log(Level.WARNING, "Device type for the rack set as null");
-        }
-        this.type = type;
-        this.devices = new Device[size];
-        clazz = Device.class;
-    }
 
     public RackArrayImpl(int size, Class clazz) {
         setRackSize(size);
@@ -77,7 +62,7 @@ public class RackArrayImpl implements Rack, Serializable {
             LOGGER.log(Level.SEVERE, "Correctly add a device", e);
             throw e;
         }
-        if ((type != null && !type.equals(device.getType())) || getDevAtSlot(index) != null || !clazz.isInstance(device)) {
+        if (getDevAtSlot(index) != null || !clazz.isInstance(device)) {
             return false;
         }
         devices[index] = device;
@@ -142,10 +127,5 @@ public class RackArrayImpl implements Rack, Serializable {
         } else {
             this.devices = new Device[size];
         }
-    }
-
-    @Deprecated
-    public String getType() {
-        return type;
     }
 }

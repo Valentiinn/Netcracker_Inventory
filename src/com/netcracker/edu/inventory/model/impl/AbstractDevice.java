@@ -37,12 +37,6 @@ abstract class AbstractDevice implements Device,Serializable {
         return type;
     }
 
-    @Deprecated
-    @Override
-    public void setType(String type) {
-        LOGGER.log(Level.WARNING, "<setType(String)> method was marked as deprecated");
-    }
-
     @Override
     public String getManufacturer() {
         return manufacturer;

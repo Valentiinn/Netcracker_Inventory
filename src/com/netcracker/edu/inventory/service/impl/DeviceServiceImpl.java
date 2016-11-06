@@ -292,7 +292,6 @@ class DeviceServiceImpl implements DeviceService {
         if (in > 0) {
             device.setIn(in);
         }
-        device.setType(type);
         device.setModel(module.equals("\n") ? null : module);
         device.setManufacturer(manufacturer.equals("\n") ? null : manufacturer);
         device.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
