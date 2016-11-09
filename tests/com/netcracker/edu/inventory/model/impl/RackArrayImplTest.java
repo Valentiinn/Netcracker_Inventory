@@ -4,6 +4,8 @@ import com.netcracker.edu.inventory.exception.DeviceValidationException;
 import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.model.Rack;
 import com.netcracker.edu.inventory.service.impl.ServiceImpl;
+import com.netcracker.edu.location.Location;
+import com.netcracker.edu.location.impl.LocationStubImpl;
 import com.netcracker.edu.main.Main;
 import org.junit.After;
 import org.junit.Before;
@@ -31,6 +33,8 @@ public class RackArrayImplTest {
     RackArrayImpl rackEmpty;
     RackArrayImpl rackPartlyFilled;
     RackArrayImpl rackFullFilled;
+
+    Location tcnc;
 
     Battery battery;
 
@@ -62,25 +66,6 @@ public class RackArrayImplTest {
     @After
     public void after() throws Exception {
 
-    }
-
-    @Deprecated
-    @Test
-    public void constructorDeprecated() throws Exception {
-        RackArrayImpl rack0 = new RackArrayImpl(5, batteryName);
-        rack0.insertDevToSlot(battery, 0);
-        rack0 = new RackArrayImpl(5, routerName);
-        Router router = new Router();
-        router.setIn(1);
-        rack0.insertDevToSlot(router, 0);
-        rack0 = new RackArrayImpl(5, switchName);
-        Switch aSwitch = new Switch();
-        aSwitch.setIn(2);
-        rack0.insertDevToSlot(aSwitch, 0);
-        rack0 = new RackArrayImpl(5, wifiRouterName);
-        WifiRouter wifiRouter = new WifiRouter();
-        wifiRouter.setIn(3);
-        rack0.insertDevToSlot(wifiRouter, 0);
     }
 
     @Test
@@ -156,6 +141,17 @@ public class RackArrayImplTest {
     }
 
     @Test
+    public void setGetLocation() throws Exception {
+        Location location = new LocationStubImpl("ua.od.onpu.ics.607.east_wall", "NC_TC_Odessa");
+
+        rackPartlyFilled.setLocation(location);
+        Location result = rackPartlyFilled.getLocation();
+
+        assertEquals(location, result);
+    }
+
+
+    @Test
     public void getSize0() throws Exception {
         int expResult0 = 0;
 
@@ -197,7 +193,7 @@ public class RackArrayImplTest {
     @Test
     public void getFreeSize() throws Exception {
         int rackSize = 10;
-        RackArrayImpl rackForWoodpecker = new RackArrayImpl(rackSize, "Battery");
+        RackArrayImpl rackForWoodpecker = new RackArrayImpl(rackSize, Battery.class);
         for (int i = 0; i < rackSize; i++) {
             rackForWoodpecker.insertDevToSlot(battery, 1);
         }
@@ -263,54 +259,6 @@ public class RackArrayImplTest {
         }
 
         assertEquals(expCount, count);
-    }
-
-    @Deprecated
-    @Test
-    public void insertDevToSlotDeprecated() throws Exception {
-
-        Rack rackEmpty = new RackArrayImpl(10, "Battery");
-        Rack rackPartlyFilled = new RackArrayImpl(10, "Battery");
-        Rack rackFullFilled = new RackArrayImpl(10, "Battery");
-
-        Battery battery = new Battery();
-        battery.setIn(12);
-
-        for (int i = 0; i < 10; i++) {
-            rackFullFilled.insertDevToSlot(battery, i);
-            if ((i % 2) == 0) {
-                rackPartlyFilled.insertDevToSlot(battery, i);
-            }
-        }
-
-        Battery anotherBattery = new Battery();
-        anotherBattery.setIn(1);
-        Router batteryBadType = new Router();
-        batteryBadType.setIn(1);
-
-        Device expResultDev = anotherBattery;
-
-        boolean result1 = rackPartlyFilled.insertDevToSlot(anotherBattery, 0);
-        boolean result2 = rackPartlyFilled.insertDevToSlot(anotherBattery, 2);
-        boolean result3 = rackPartlyFilled.insertDevToSlot(anotherBattery, 8);
-        boolean result4 = rackEmpty.insertDevToSlot(anotherBattery, 0);
-        Device result4a = rackEmpty.getDevAtSlot(0);
-        boolean result5 = rackEmpty.insertDevToSlot(anotherBattery, 3);
-        Device result5a = rackEmpty.getDevAtSlot(3);
-        boolean result6 = rackEmpty.insertDevToSlot(anotherBattery, 9);
-        Device result6a = rackEmpty.getDevAtSlot(9);
-        boolean result7 = rackPartlyFilled.insertDevToSlot(batteryBadType, 7); //not filled
-
-        assertFalse(result1);
-        assertFalse(result2);
-        assertFalse(result3);
-        assertTrue(result4);
-        assertEquals(expResultDev, result4a);
-        assertTrue(result5);
-        assertEquals(expResultDev, result5a);
-        assertTrue(result6);
-        assertEquals(expResultDev, result6a);
-        assertFalse(result7);
     }
 
     @Test

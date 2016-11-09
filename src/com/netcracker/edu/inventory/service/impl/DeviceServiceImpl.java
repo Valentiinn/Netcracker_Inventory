@@ -184,7 +184,6 @@ class DeviceServiceImpl implements DeviceService {
             LOGGER.log(Level.SEVERE, "an exception was thrown", e);
             throw e;
         }
-        Date date = null;
         writer.write(device.getClass().getName() + "\n");
         writer.write("[" + device.getIn() + "]| ");
         writer.write(formatString(device.getType()));
@@ -284,7 +283,6 @@ class DeviceServiceImpl implements DeviceService {
 
     private Device setDevValues(Device device, DataInputStream dataInputStream) throws IOException {
         int in = dataInputStream.readInt();
-        String type = dataInputStream.readUTF(dataInputStream);
         String module = dataInputStream.readUTF(dataInputStream);
         String manufacturer = dataInputStream.readUTF(dataInputStream);
         long productionDate = dataInputStream.readLong();

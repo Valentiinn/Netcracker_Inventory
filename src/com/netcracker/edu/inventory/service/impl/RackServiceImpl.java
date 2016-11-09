@@ -5,6 +5,9 @@ import com.netcracker.edu.inventory.model.Rack;
 import com.netcracker.edu.inventory.model.impl.*;
 import com.netcracker.edu.inventory.service.DeviceService;
 import com.netcracker.edu.inventory.service.RackService;
+import com.netcracker.edu.location.Location;
+import com.netcracker.edu.location.impl.*;
+import com.netcracker.edu.location.impl.ServiceImpl;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
@@ -13,6 +16,7 @@ import java.util.logging.Logger;
 
 class RackServiceImpl implements RackService {
     static protected Logger LOGGER = Logger.getLogger(RackServiceImpl.class.getName());
+    private ServiceImpl service;
 
     @Override
     public void writeRack(Rack rack, Writer writer) throws IOException {
@@ -22,6 +26,7 @@ class RackServiceImpl implements RackService {
             throw e;
         }
         if (rack != null) {
+            service.writeLocation(rack.getLocation(), writer);
             writer.write(rack.getSize() + " " + rack.getTypeOfDevices().getName() + "\n");
             DeviceService deviceService = new DeviceServiceImpl();
             for (int i = 0; i < rack.getSize(); i++) {
@@ -42,7 +47,7 @@ class RackServiceImpl implements RackService {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw e;
         }
-
+        service.readLocation(reader);
         String rackSize = "";
         String rackType = "";
         int data = reader.read();
@@ -91,10 +96,11 @@ class RackServiceImpl implements RackService {
             LOGGER.log(Level.SEVERE, illegalArgumentException.getMessage(), illegalArgumentException);
             throw illegalArgumentException;
         }
-
+        service.outputLocation(rack.getLocation(), outputStream);
         DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
         dataOutputStream.writeInt(rack.getSize());
         dataOutputStream.writeUTF(rack.getTypeOfDevices().getName());
+
 
         DeviceServiceImpl deviceService = new DeviceServiceImpl();
 
@@ -115,11 +121,13 @@ class RackServiceImpl implements RackService {
             LOGGER.log(Level.SEVERE, illegalArgumentException.getMessage(), illegalArgumentException);
             throw illegalArgumentException;
         }
+
         DataInputStream dataInputStream = new DataInputStream(inputStream);
         DeviceServiceImpl deviceService = new DeviceServiceImpl();
         int size = dataInputStream.readInt();
         Class typeClazz = Class.forName(dataInputStream.readUTF());
         Rack rack = new RackArrayImpl(size, typeClazz);
+        service.inputLocation(inputStream);
         for (int i = 0; i < rack.getSize(); i++) {
             if (!dataInputStream.readUTF().equals("\n")) {
                 Device device = deviceService.inputDevice(dataInputStream);

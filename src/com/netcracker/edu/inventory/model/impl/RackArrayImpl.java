@@ -3,28 +3,40 @@ package com.netcracker.edu.inventory.model.impl;
 import com.netcracker.edu.inventory.exception.DeviceValidationException;
 import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.model.Rack;
+import com.netcracker.edu.location.Location;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class RackArrayImpl implements Rack, Serializable {
+public class RackArrayImpl<T extends Device> implements Rack<T>, Serializable {
 
     static protected Logger LOGGER = Logger.getLogger(RackArrayImpl.class.getName());
-    private final Class clazz;
-    private Device[] devices;
+    private final Class<T> clazz;
+    private T[] devices;
+    private Location location;
 
-    public RackArrayImpl(int size, Class clazz) {
+    public RackArrayImpl(int size, Class<T> clazz) {
         setRackSize(size);
         if (clazz == null) {
             IllegalArgumentException e = new IllegalArgumentException("Device class should not be null");
             LOGGER.log(Level.SEVERE, "Invalid device class.", e);
             throw e;
         }
-
-        devices = new Device[size];
+        devices = (T[]) (new Device[size]);
         this.clazz = clazz;
+    }
+
+
+    @Override
+    public Location getLocation() {
+        return location;
+    }
+
+    @Override
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     @Override
@@ -43,19 +55,20 @@ public class RackArrayImpl implements Rack, Serializable {
         return freeSize;
     }
 
+    @Deprecated
     @Override
-    public Class getTypeOfDevices() {
+    public Class<T> getTypeOfDevices() {
         return clazz;
     }
 
     @Override
-    public Device getDevAtSlot(int index) {
+    public T getDevAtSlot(int index) {
         checkIndexLimit(index);
         return devices[index];
     }
 
     @Override
-    public boolean insertDevToSlot(Device device, int index) {
+    public boolean insertDevToSlot(T device, int index) {
         checkIndexLimit(index);
         if (device == null || device.getType() == null || device.getIn() == 0) {
             DeviceValidationException e = new DeviceValidationException("Rack.insertDevToSlot", device);
@@ -70,7 +83,7 @@ public class RackArrayImpl implements Rack, Serializable {
     }
 
     @Override
-    public Device removeDevFromSlot(int index) {
+    public T removeDevFromSlot(int index) {
         checkIndexLimit(index);
         if (devices[index] == null) {
             LOGGER.log(Level.WARNING, "Can not remove from empty slot " + index);
@@ -78,11 +91,11 @@ public class RackArrayImpl implements Rack, Serializable {
         }
         Device device = devices[index];
         devices[index] = null;
-        return device;
+        return (T) device;
     }
 
     @Override
-    public Device getDevByIN(int in) {
+    public T getDevByIN(int in) {
         for (int i = 0; i < getSize(); i++) {
             if (devices[i] != null && (devices[i].getIn() == in)) {
                 return devices[i];
@@ -92,7 +105,7 @@ public class RackArrayImpl implements Rack, Serializable {
     }
 
     @Override
-    public Device[] getAllDeviceAsArray() {
+    public T[] getAllDeviceAsArray() {
         ArrayList<Device> list = new ArrayList<Device>();
 
         for (int i = 0; i < devices.length; i++) {
@@ -104,7 +117,7 @@ public class RackArrayImpl implements Rack, Serializable {
         Device[] result = new Device[list.size()];
         list.toArray(result);
 
-        return result;
+        return (T[]) result;
     }
 
     private void checkIndexLimit(int index) {
@@ -125,7 +138,7 @@ public class RackArrayImpl implements Rack, Serializable {
             LOGGER.log(Level.SEVERE, "Incorrect rack size", e);
             throw e;
         } else {
-            this.devices = new Device[size];
+            this.devices = (T[]) new Device[size];
         }
     }
 }

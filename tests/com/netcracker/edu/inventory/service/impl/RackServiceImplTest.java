@@ -4,6 +4,8 @@ import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.model.Rack;
 import com.netcracker.edu.inventory.model.impl.*;
 import com.netcracker.edu.inventory.service.RackService;
+import com.netcracker.edu.location.Location;
+import com.netcracker.edu.location.impl.LocationStubImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,6 +44,7 @@ public class RackServiceImplTest {
         router.setIn(5);
         Rack emptyRack = new RackArrayImpl(0, Device.class);
         Rack partlyRack =  new RackArrayImpl(3, Router.class);
+        partlyRack.setLocation(new LocationStubImpl("ua.od.onpu.ics.607.east_wall", "NC_TC_Odessa"));
         partlyRack.insertDevToSlot(aSwitch, 0);
         partlyRack.insertDevToSlot(router, 2);
 
@@ -90,6 +93,7 @@ public class RackServiceImplTest {
         router.setIn(5);
         Rack emptyRack = new RackArrayImpl(0, Device.class);
         Rack partlyRack =  new RackArrayImpl(3, Router.class);
+        partlyRack.setLocation(new LocationStubImpl("ua.od.onpu.ics.607.east_wall", "NC_TC_Odessa"));
         partlyRack.insertDevToSlot(aSwitch, 0);
         partlyRack.insertDevToSlot(router, 2);
 
@@ -131,12 +135,13 @@ public class RackServiceImplTest {
     @Test
     public void serializeDeserializeRack() throws Exception {
         PipedOutputStream pipedOutputStream = new PipedOutputStream();
-        PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream, 2048);
+        PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream, 4096);
         Switch aSwitch = DeviceServiceImplTest.createSwitch();
         Router router = DeviceServiceImplTest.createRouter();
         router.setIn(5);
         Rack emptyRack = new RackArrayImpl(0, Device.class);
         Rack partlyRack =  new RackArrayImpl(3, Router.class);
+        partlyRack.setLocation(new LocationStubImpl("ua.od.onpu.ics.607.east_wall", "NC_TC_Odessa"));
         partlyRack.insertDevToSlot(aSwitch, 0);
         partlyRack.insertDevToSlot(router, 2);
 
@@ -176,31 +181,33 @@ public class RackServiceImplTest {
     }
 
     static void assertRack(Rack expRack, Rack rack) throws Exception {
+        if ((expRack.getLocation() == null) || (rack.getLocation() == null)) {
+            assertEquals(expRack.getLocation(), rack.getLocation());
+        } else {
+            assertEquals(expRack.getLocation().getFullName(), rack.getLocation().getFullName());
+            assertEquals(expRack.getLocation().getShortName(), rack.getLocation().getShortName());
+        }
         assertEquals(expRack.getSize(), rack.getSize());
         assertEquals(expRack.getTypeOfDevices(), rack.getTypeOfDevices());
         for (int i = 0; i < expRack.getSize(); i++) {
             Device expDevice = expRack.getDevAtSlot(i);
             Device device = rack.getDevAtSlot(i);
-            if (expDevice == null) {
-                assertNull(device);
-            } else {
-                assertEquals(expDevice.getClass(), device.getClass());
-                if (expDevice.getClass() == Battery.class) {
-                    DeviceServiceImplTest.assertBattery((Battery) expDevice, (Battery) device);
-                    continue;
-                }
-                if (expDevice.getClass() == Router.class) {
-                    DeviceServiceImplTest.assertRouter((Router) expDevice, (Router) device);
-                    continue;
-                }
-                if (expDevice.getClass() == Switch.class) {
-                    DeviceServiceImplTest.assertSwitch((Switch) expDevice, (Switch) device);
-                    continue;
-                }
-                if (expDevice.getClass() == WifiRouter.class) {
-                    DeviceServiceImplTest.assertWifiRouter((WifiRouter) expDevice, (WifiRouter) device);
-                    continue;
-                }
+            assertEquals(expDevice.getClass(), device.getClass());
+            if (expDevice.getClass() == Battery.class) {
+                DeviceServiceImplTest.assertBattery((Battery) expDevice, (Battery) device);
+                break;
+            }
+            if (expDevice.getClass() == Router.class) {
+                DeviceServiceImplTest.assertRouter((Router) expDevice, (Router) device);
+                break;
+            }
+            if (expDevice.getClass() == Switch.class) {
+                DeviceServiceImplTest.assertSwitch((Switch) expDevice, (Switch) device);
+                break;
+            }
+            if (expDevice.getClass() == WifiRouter.class) {
+                DeviceServiceImplTest.assertWifiRouter((WifiRouter) expDevice, (WifiRouter) device);
+                break;
             }
         }
     }

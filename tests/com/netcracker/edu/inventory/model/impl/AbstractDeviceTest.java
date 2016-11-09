@@ -1,6 +1,7 @@
 package com.netcracker.edu.inventory.model.impl;
 
 import com.netcracker.edu.inventory.model.Device;
+import com.netcracker.edu.inventory.service.impl.DeviceServiceImplTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -53,15 +54,6 @@ public class AbstractDeviceTest {
         device.setIn(inm3);
     }
 
-    @Deprecated
-    @Test
-    public void setGetTypeDeprecated() throws Exception {
-        device.setType(type);
-        String result = device.getType();
-
-        assertEquals(type, result);
-    }
-
     @Test
     public void setGetType() throws Exception {
         String result = device.getType();
@@ -91,6 +83,27 @@ public class AbstractDeviceTest {
         Date result = device.getProductionDate();
 
         assertEquals(productionDate, result);
+    }
+
+    @Test
+    public void testGetAndFeelAllFields() throws Exception {
+        device.setIn(5);
+        device.setModel("model");
+        device.setManufacturer("  ");
+        device.setProductionDate(new Date());
+
+        Device result1 = new AbstractDevice() {};
+        result1.feelAllFields(device.getAllFields());
+
+        DeviceServiceImplTest.assertDevice(device, result1);
+    }
+
+    @Test
+    public void testGetAndFeelAllFields_EmptyDevice() throws Exception {
+        Device result1 = new AbstractDevice() {};
+        result1.feelAllFields(device.getAllFields());
+
+        DeviceServiceImplTest.assertDevice(device, result1);
     }
 
 }

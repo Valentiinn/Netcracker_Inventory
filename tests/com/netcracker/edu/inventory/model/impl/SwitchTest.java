@@ -1,6 +1,7 @@
 package com.netcracker.edu.inventory.model.impl;
 
 import com.netcracker.edu.inventory.model.Device;
+import com.netcracker.edu.inventory.service.impl.DeviceServiceImplTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +33,24 @@ public class SwitchTest {
         int result = aSwitch.getNumberOfPorts();
 
         assertEquals(numberOfPorts, result);
+    }
+
+    @Test
+    public void testGetAndFeelAllFields() throws Exception {
+        aSwitch = DeviceServiceImplTest.createSwitch();
+
+        Device result1 = new Switch();
+        result1.feelAllFields(aSwitch.getAllFields());
+
+        DeviceServiceImplTest.assertDevice(aSwitch, result1);
+    }
+
+    @Test
+    public void testGetAndFeelAllFields_EmptyDevice() throws Exception {
+        Device result1 = new Switch();
+        result1.feelAllFields(aSwitch.getAllFields());
+
+        DeviceServiceImplTest.assertDevice(aSwitch, result1);
     }
 
 }

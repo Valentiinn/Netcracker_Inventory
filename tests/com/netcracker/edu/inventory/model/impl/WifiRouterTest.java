@@ -1,6 +1,7 @@
 package com.netcracker.edu.inventory.model.impl;
 
 import com.netcracker.edu.inventory.model.Device;
+import com.netcracker.edu.inventory.service.impl.DeviceServiceImplTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +33,24 @@ public class WifiRouterTest {
         String result = wifiRouter.getSecurityProtocol();
 
         assertEquals(securityProtocol, result);
+    }
+
+    @Test
+    public void testGetAndFeelAllFields() throws Exception {
+        wifiRouter = DeviceServiceImplTest.createWifiRouter();
+
+        Device result1 = new WifiRouter();
+        result1.feelAllFields(wifiRouter.getAllFields());
+
+        DeviceServiceImplTest.assertDevice(wifiRouter, result1);
+    }
+
+    @Test
+    public void testGetAndFeelAllFields_EmptyDevice() throws Exception {
+        Device result1 = new WifiRouter();
+        result1.feelAllFields(wifiRouter.getAllFields());
+
+        DeviceServiceImplTest.assertDevice(wifiRouter, result1);
     }
 
 }

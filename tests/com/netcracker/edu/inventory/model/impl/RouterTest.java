@@ -1,6 +1,7 @@
 package com.netcracker.edu.inventory.model.impl;
 
 import com.netcracker.edu.inventory.model.Device;
+import com.netcracker.edu.inventory.service.impl.DeviceServiceImplTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +33,24 @@ public class RouterTest {
         int result = router.getDataRate();
 
         assertEquals(dataRate, result);
+    }
+
+    @Test
+    public void testGetAndFeelAllFields() throws Exception {
+        router = DeviceServiceImplTest.createRouter();
+
+        Device result1 = new Router();
+        result1.feelAllFields(router.getAllFields());
+
+        DeviceServiceImplTest.assertDevice(router, result1);
+    }
+
+    @Test
+    public void testGetAndFeelAllFields_EmptyDevice() throws Exception {
+        Device result1 = new Router();
+        result1.feelAllFields(router.getAllFields());
+
+        DeviceServiceImplTest.assertDevice(router, result1);
     }
 
 }

@@ -6,6 +6,8 @@ import com.netcracker.edu.inventory.model.impl.Router;
 import com.netcracker.edu.inventory.model.impl.Switch;
 import com.netcracker.edu.inventory.model.impl.WifiRouter;
 import com.netcracker.edu.inventory.service.DeviceService;
+import com.netcracker.edu.location.Location;
+import com.netcracker.edu.location.impl.LocationStubImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -314,7 +316,7 @@ public class DeviceServiceImplTest {
         deviceService.deserializeDevice(null);
     }
 
-    static Battery createBattery() {
+    public static Battery createBattery() {
         Battery battery = new Battery();
         battery.setIn(4);
         battery.setManufacturer("");
@@ -324,14 +326,14 @@ public class DeviceServiceImplTest {
         return battery;
     }
 
-    static Router createRouter() {
+    public static Router createRouter() {
         Router router = new Router();
         router.setManufacturer("D-link");
         router.setDataRate(1000);
         return router;
     }
 
-    static Switch createSwitch() {
+    public static Switch createSwitch() {
         Switch aSwitch = new Switch();
         aSwitch.setIn(7);
         aSwitch.setModel("null");
@@ -341,7 +343,7 @@ public class DeviceServiceImplTest {
         return aSwitch;
     }
 
-    static WifiRouter createWifiRouter() {
+    public static WifiRouter createWifiRouter() {
         WifiRouter wifiRouter = new WifiRouter();
         wifiRouter.setIn(7);
         wifiRouter.setModel(null);
@@ -350,7 +352,7 @@ public class DeviceServiceImplTest {
         return wifiRouter;
     }
 
-    static void assertDevice(Device expDevice, Device device) throws Exception {
+    public static void assertDevice(Device expDevice, Device device) throws Exception {
         assertEquals(expDevice.getIn(), device.getIn());
         assertEquals(expDevice.getType(), device.getType());
         assertEquals(expDevice.getModel(), device.getModel());
@@ -358,22 +360,22 @@ public class DeviceServiceImplTest {
         assertEquals(expDevice.getProductionDate(), device.getProductionDate());
     }
 
-    static void assertBattery(Battery expBattery, Battery battery) throws Exception {
+    public static void assertBattery(Battery expBattery, Battery battery) throws Exception {
         assertDevice(expBattery, battery);
         assertEquals(expBattery.getChargeVolume(), battery.getChargeVolume());
     }
 
-    static void assertRouter(Router expRouter, Router router) throws Exception {
+    public static void assertRouter(Router expRouter, Router router) throws Exception {
         assertDevice(expRouter, router);
         assertEquals(expRouter.getDataRate(), router.getDataRate());
     }
 
-    static void assertSwitch(Switch expSwitch, Switch aSwitch) throws Exception {
+    public static void assertSwitch(Switch expSwitch, Switch aSwitch) throws Exception {
         assertRouter(expSwitch, aSwitch);
         assertEquals(expSwitch.getNumberOfPorts(), aSwitch.getNumberOfPorts());
     }
 
-    static void assertWifiRouter(WifiRouter expWifiRouter, WifiRouter wifiRouter) throws Exception {
+    public static void assertWifiRouter(WifiRouter expWifiRouter, WifiRouter wifiRouter) throws Exception {
         assertRouter(expWifiRouter, wifiRouter);
         assertEquals(expWifiRouter.getSecurityProtocol(), wifiRouter.getSecurityProtocol());
     }
