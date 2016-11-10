@@ -107,32 +107,26 @@ public class RackArrayImpl<T extends Device> implements Rack<T>, Serializable {
     @Override
     public T[] getAllDeviceAsArray() {
         ArrayList<Device> list = new ArrayList<Device>();
-
         for (int i = 0; i < devices.length; i++) {
             if (devices[i] != null) {
                 list.add(devices[i]);
             }
         }
-
         Device[] result = new Device[list.size()];
         list.toArray(result);
-
         return (T[]) result;
     }
 
     private void checkIndexLimit(int index) {
-
         if (index > devices.length - 1 || index < 0) {
             IndexOutOfBoundsException e = new IndexOutOfBoundsException("The entered index " + index + " is invalid!" +
                     "\nValid range from 0 to " + devices.length);
-
             LOGGER.log(Level.SEVERE, "Invalid slot index.", e);
             throw e;
         }
     }
 
     private void setRackSize(int size) {
-
         if (size < 0) {
             IllegalArgumentException e = new IllegalArgumentException("Rack size should not be negative");
             LOGGER.log(Level.SEVERE, "Incorrect rack size", e);

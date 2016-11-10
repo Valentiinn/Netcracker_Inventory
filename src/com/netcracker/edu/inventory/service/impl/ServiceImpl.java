@@ -4,11 +4,6 @@ import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.service.DeviceService;
 import com.netcracker.edu.inventory.service.RackService;
 import com.netcracker.edu.inventory.service.Service;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ServiceImpl implements Service {

@@ -1,17 +1,9 @@
 package com.netcracker.edu.inventory.service.impl;
 
-import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.model.Rack;
-import com.netcracker.edu.inventory.model.impl.*;
-import com.netcracker.edu.inventory.service.DeviceService;
 import com.netcracker.edu.inventory.service.RackService;
-import com.netcracker.edu.location.Location;
-import com.netcracker.edu.location.impl.*;
-import com.netcracker.edu.location.impl.ServiceImpl;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 class RackServiceImpl implements RackService {
