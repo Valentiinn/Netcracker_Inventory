@@ -2,6 +2,7 @@ package com.netcracker.edu.inventory.service.impl;
 
 
 import com.netcracker.edu.inventory.model.Device;
+
 import java.util.Arrays;
 import java.util.Comparator;
 

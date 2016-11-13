@@ -18,9 +18,7 @@ public class Battery extends AbstractDevice implements Device {
     @Override
     public void feelAllFields(Field[] fields) {
         super.feelAllFields(fields);
-        if (fields[5].getType() == Integer.class) {
-            chargeVolume = (Integer) fields[5].getValue();
-        }
+        setChargeVolume((Integer) fields[5].getValue());
     }
 
     @Override

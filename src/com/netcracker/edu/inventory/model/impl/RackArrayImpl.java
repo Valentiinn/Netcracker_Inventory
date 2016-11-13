@@ -107,13 +107,16 @@ public class RackArrayImpl<T extends Device> implements Rack<T>, Serializable {
     @Override
     public T[] getAllDeviceAsArray() {
         ArrayList<Device> list = new ArrayList<Device>();
+
         for (int i = 0; i < devices.length; i++) {
             if (devices[i] != null) {
                 list.add(devices[i]);
             }
         }
+
         Device[] result = new Device[list.size()];
         list.toArray(result);
+
         return (T[]) result;
     }
 

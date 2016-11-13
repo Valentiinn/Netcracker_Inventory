@@ -3,6 +3,7 @@ package com.netcracker.edu.inventory.model.impl;
 import com.netcracker.edu.inventory.model.Device;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,32 +70,27 @@ abstract class AbstractDevice implements Device, Serializable {
 
     @Override
     public void feelAllFields(Field[] fields) {
-        feelAllFields(fields);
-        setIn((Integer) fields[0].getValue());
-        setManufacturer((String) fields[1].getValue());
-        setModel((String) fields[2].getValue());
-        setProductionDate((Date) fields[3].getValue());
+        if ((Integer) fields[0].getValue() > 0) {
+            setIn((Integer) fields[0].getValue());
+        }
+        setManufacturer((String) fields[2].getValue());
+        setModel((String) fields[3].getValue());
+        setProductionDate((Date) fields[4].getValue());
     }
 
     @Override
     public Field[] getAllFields() {
         Field[] fields = new Field[5];
-        System.arraycopy(getAllFields(), 0, fields, 0, 0);
-        System.arraycopy(getAllFields(), 0, fields, 0, 1);
-        System.arraycopy(getAllFields(), 0, fields, 0, 2);
-        System.arraycopy(getAllFields(), 0, fields, 0, 3);
         Field in = new Field(Integer.class, getIn());
         Field manufacturer = new Field(Integer.class, getManufacturer());
         Field model = new Field(Integer.class, getModel());
         Field productionDate = new Field(Integer.class, getProductionDate());
         Field type = new Field(Integer.class, getType());
         fields[0] = in;
-        fields[1] = manufacturer;
-        fields[2] = model;
-        fields[3] = productionDate;
-        fields[4] = type;
+        fields[1] = type;
+        fields[2] = manufacturer;
+        fields[3] = model;
+        fields[4] = productionDate;
         return fields;
     }
-
-
 }

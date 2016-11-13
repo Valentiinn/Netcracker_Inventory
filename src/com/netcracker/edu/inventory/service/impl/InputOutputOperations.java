@@ -1,10 +1,15 @@
 package com.netcracker.edu.inventory.service.impl;
 
+import com.netcracker.edu.inventory.exception.DeviceValidationException;
 import com.netcracker.edu.inventory.model.Device;
+import com.netcracker.edu.inventory.model.FeelableEntity;
 import com.netcracker.edu.inventory.model.Rack;
 import com.netcracker.edu.inventory.model.impl.*;
 import com.netcracker.edu.inventory.service.DeviceService;
+import com.netcracker.edu.location.Location;
 import com.netcracker.edu.location.Service;
+import com.netcracker.edu.location.impl.ServiceImpl;
+
 import java.io.*;
 import java.util.Date;
 import java.util.logging.Level;
@@ -12,8 +17,9 @@ import java.util.logging.Logger;
 
 class InputOutputOperations {
 
-    static protected Logger LOGGER = Logger.getLogger(DeviceServiceImpl.class.getName());
-    private Service service;
+    private static Logger LOGGER = Logger.getLogger(DeviceServiceImpl.class.getName());
+    private DeviceValidator validator = new DeviceValidator();
+    private Service service = new ServiceImpl();
 
     public void outputDevice(Device device, OutputStream outputStream) throws IOException {
         if (device == null) {
@@ -26,81 +32,173 @@ class InputOutputOperations {
             throw illegalArgumentException;
         }
 
+        FeelableEntity.Field[] fields = device.getAllFields();
         DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
         dataOutputStream.writeUTF(device.getClass().getName());
-        dataOutputStream.writeInt(device.getIn());
-        dataOutputStream.writeUTF(device.getType());
-        dataOutputStream.writeUTF(device.getModel() == null ? "\n" : device.getModel());
-        dataOutputStream.writeUTF(device.getManufacturer() == null ? "\n" : device.getManufacturer());
-        dataOutputStream.writeLong(device.getProductionDate() == null ? -1 : device.getProductionDate().getTime());
+        dataOutputStream.writeInt((Integer) fields[0].getValue());
+        dataOutputStream.writeUTF((String) fields[1].getValue());
+        dataOutputStream.writeUTF(fields[3].getValue() == null ? "\\" : (String) fields[3].getValue());
+        dataOutputStream.writeUTF(fields[2].getValue() == null ? "\\" : (String) fields[2].getValue());
+        dataOutputStream.writeLong(fields[4].getValue() == null ? -1 : ((Date) fields[4].getValue()).getTime());
 
         if (Battery.class.isInstance(device)) {
             Battery battery = (Battery) device;
-            dataOutputStream.writeInt(battery.getChargeVolume());
+            dataOutputStream.writeInt((Integer) fields[5].getValue());
         }
         if (Router.class.isInstance(device)) {
             Router router = (Router) device;
-            dataOutputStream.writeInt(router.getDataRate());
+            dataOutputStream.writeInt((Integer) fields[5].getValue());
         }
         if (Switch.class.isInstance(device)) {
             Switch aSwitch = (Switch) device;
-            dataOutputStream.writeInt(aSwitch.getNumberOfPorts());
+            dataOutputStream.writeInt((Integer) fields[6].getValue());
         }
         if (WifiRouter.class.isInstance(device)) {
             WifiRouter wifiRouter = (WifiRouter) device;
-            dataOutputStream.writeUTF(wifiRouter.getSecurityProtocol() == null ? "\n" : wifiRouter.getSecurityProtocol());
+            dataOutputStream.writeUTF(fields[6].getValue() == null ? "\n" : (String) fields[6].getValue());
         }
-
-
     }
-
 
     public Device inputDevice(InputStream inputStream) throws IOException, ClassNotFoundException {
         if (inputStream == null) {
-            IllegalArgumentException illegalArgumentException = new IllegalArgumentException("InputStream cannot be null");
-            LOGGER.log(Level.SEVERE, illegalArgumentException.getMessage(), illegalArgumentException);
-            throw illegalArgumentException;
+            IllegalArgumentException e = new IllegalArgumentException("InputStream should not be null");
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
         }
-
         DataInputStream dataInputStream = new DataInputStream(inputStream);
         Class clazz = Class.forName(dataInputStream.readUTF());
         if (clazz.isInstance(new Battery())) {
             Battery battery = new Battery();
-            battery = (Battery) this.setDevValues(battery, dataInputStream);
+            FeelableEntity.Field[] fields = new FeelableEntity.Field[6];
+            System.arraycopy(setDevValues(dataInputStream), 0, fields, 0, 5);
             int chargeVolume = dataInputStream.readInt();
-            battery.setChargeVolume(chargeVolume);
+            fields[5] = new FeelableEntity.Field(Integer.class, chargeVolume);
+            battery.feelAllFields(fields);
             return battery;
-        }
-        if (clazz.isInstance(new Router())) {
+        } else if (clazz.isInstance(new Router())) {
             Router router = new Router();
-            router = (Router) this.setDevValues(router, dataInputStream);
+            FeelableEntity.Field[] fields = new FeelableEntity.Field[6];
+            System.arraycopy(setDevValues(dataInputStream), 0, fields, 0, 5);
             int dateRate = dataInputStream.readInt();
-            router.setDataRate(dateRate);
+            fields[5] = new FeelableEntity.Field(Integer.class, dateRate);
+            router.feelAllFields(fields);
             return router;
-
-        }
-        if (clazz.isInstance(new Switch())) {
-            Switch switcher = new Switch();
-            switcher = (Switch) this.setDevValues(switcher, dataInputStream);
+        } else if (clazz.isInstance(new Switch())) {
+            Switch aSwitch = new Switch();
+            FeelableEntity.Field[] fields = new FeelableEntity.Field[7];
+            System.arraycopy(setDevValues(dataInputStream), 0, fields, 0, 5);
             int dateRate = dataInputStream.readInt();
+            fields[5] = new FeelableEntity.Field(Integer.class, dateRate);
             int numberOfPorts = dataInputStream.readInt();
-            switcher.setDataRate(dateRate);
-            switcher.setNumberOfPorts(numberOfPorts);
-            return switcher;
-
-        }
-        if (clazz.isInstance(new WifiRouter())) {
+            fields[6] = new FeelableEntity.Field(Integer.class, numberOfPorts);
+            aSwitch.feelAllFields(fields);
+            return aSwitch;
+        } else if (clazz.isInstance(new WifiRouter())) {
             WifiRouter wifiRouter = new WifiRouter();
-            wifiRouter = (WifiRouter) this.setDevValues(wifiRouter, dataInputStream);
+            FeelableEntity.Field[] fields = new FeelableEntity.Field[7];
+            System.arraycopy(setDevValues(dataInputStream), 0, fields, 0, 5);
             int dateRate = dataInputStream.readInt();
+            fields[5] = new FeelableEntity.Field(Integer.class, dateRate);
             String securityProtocol = dataInputStream.readUTF();
-            wifiRouter.setDataRate(dateRate);
-            wifiRouter.setSecurityProtocol(securityProtocol.equals("\n") ? null : securityProtocol);
+            fields[6] = new FeelableEntity.Field(String.class, securityProtocol.equals("\\") ? null : securityProtocol);
+            wifiRouter.feelAllFields(fields);
             return wifiRouter;
         }
         return null;
     }
 
+    public void writeDevice(Device device, Writer writer) throws IOException {
+        if (device != null) {
+            if (validator.isValidDeviceForWriteToStream(device) != true) {
+                DeviceValidationException e = new DeviceValidationException("DeviceService.writeDevice", device);
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                throw e;
+            } else if (writer == null) {
+                IllegalArgumentException e = new IllegalArgumentException("Writer should not be null");
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                throw e;
+            }
+            FeelableEntity.Field[] fields = device.getAllFields();
+            writer.write(device.getClass().getName());
+            writer.write("\n" + "[" + fields[0].getValue() + "] ");
+            writer.write(fields[1].getValue() + " | ");
+            writer.write(fields[3].getValue() == null ? "| " : (String) fields[3].getValue() + " | ");
+            writer.write(fields[2].getValue() == null ? "| " : (String) fields[2].getValue() + " | ");
+            writer.write(device.getProductionDate() == null ? -1 + " | " : ((Date) fields[4].getValue()).getTime() + " | ");
+            if (Battery.class.isInstance(device)) {
+                Battery battery = (Battery) device;
+                writer.write(fields[5].getValue() + " |");
+            } else if (Router.class.isInstance(device)) {
+                Router router = (Router) device;
+                writer.write(fields[5].getValue() + " |");
+                if (WifiRouter.class.isInstance(router)) {
+                    WifiRouter wifiRouter = (WifiRouter) router;
+                    writer.write(" ");
+                    writer.write(fields[6].getValue() == null ? "|" : (String) fields[6].getValue() + " |");
+                } else if (Switch.class.isInstance(router)) {
+                    Switch aSwitch = (Switch) router;
+                    writer.write(" " + (Integer) fields[6].getValue() + " |");
+                }
+            }
+            writer.write("\n");
+        }
+    }
+
+    public Device readDevice(Reader reader) throws IOException, ClassNotFoundException {
+        if (reader == null) {
+            IllegalArgumentException e = new IllegalArgumentException("Reader should not be null");
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
+        }
+
+        Class clazz = null;
+        String clazzName = null;
+        String value = null;
+        boolean flag = true;
+        StringBuilder clazzBuilder = new StringBuilder();
+        StringBuilder objectBuilder = new StringBuilder();
+        while (flag) {
+            char x = (char) reader.read();
+            if (x == '\n') break;
+            clazzBuilder.append(x);
+        }
+        clazzName = clazzBuilder.toString();
+        if (!"".equals(clazzName)) {
+            clazz = Class.forName(clazzName);
+        } else {
+            return null;
+        }
+        while (flag) {
+            char x = (char) reader.read();
+            if (x == '\n') break;
+            objectBuilder.append(x);
+        }
+        value = objectBuilder.toString();
+        FeelableEntity.Field[] fields = setDevValues(value, clazz);
+        if (clazz.isInstance(new Battery())) {
+            Battery battery = new Battery();
+            battery.feelAllFields(fields);
+            return battery;
+        }
+        if (clazz.isInstance(new Router())) {
+            Router router = new Router();
+            router.feelAllFields(fields);
+            return router;
+        }
+        if (clazz.isInstance(new Switch())) {
+            Switch aSwitch = new Switch();
+            aSwitch.feelAllFields(fields);
+            return aSwitch;
+        }
+        if (clazz.isInstance(new WifiRouter())) {
+            WifiRouter wifiRouter = new WifiRouter();
+            wifiRouter.feelAllFields(fields);
+            return wifiRouter;
+        }
+        ClassNotFoundException e = new ClassNotFoundException("Class not found");
+        LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        throw e;
+    }
 
     public void serializeDevice(Device device, OutputStream outputStream) throws IOException {
         if (device == null) {
@@ -117,7 +215,6 @@ class InputOutputOperations {
         out.writeObject(device);
     }
 
-
     public Device deserializeDevice(InputStream inputStream)
             throws IOException, ClassCastException, ClassNotFoundException {
         if (inputStream == null) {
@@ -132,167 +229,30 @@ class InputOutputOperations {
         return device;
     }
 
-    public void writeDevice(Device device, Writer writer) throws IOException {
-        if (device == null) {
+    public void serializeRack(Rack rack, OutputStream outputStream) throws IOException {
+        if (rack == null) {
             return;
         }
 
-        if (writer == null) {
-            IllegalArgumentException e = new IllegalArgumentException("Stream Writer can't be null");
-            LOGGER.log(Level.SEVERE, "an exception was thrown", e);
-            throw e;
-        }
-        writer.write(device.getClass().getName() + "\n");
-        writer.write("[" + device.getIn() + "]| ");
-        writer.write(formatString(device.getType()));
-        writer.write(formatString(device.getModel()));
-        writer.write(formatString(device.getManufacturer()));
-        writer.write(" " + String.valueOf((device.getProductionDate() == null ? -1 : device.getProductionDate().getTime())) + " |");
-
-
-        if (device instanceof Battery) {
-            Battery battery = (Battery) device;
-            writer.write(" " + battery.getChargeVolume() + " |");
-        }
-
-        if (device instanceof Router) {
-            Router router = (Router) device;
-            writer.write(" " + router.getDataRate() + " |");
-        }
-
-        if (device instanceof Switch) {
-            Switch devSwitch = (Switch) device;
-            writer.write(" " + devSwitch.getNumberOfPorts() + " |");
-        }
-
-        if (device instanceof WifiRouter) {
-            WifiRouter wifiRouter = (WifiRouter) device;
-            writer.write(formatString(wifiRouter.getSecurityProtocol()));
-        }
-        writer.write("\n");
-    }
-
-
-    public Device readDevice(Reader reader) throws IOException, ClassNotFoundException {
-        if (reader == null) {
-            IllegalArgumentException e = new IllegalArgumentException("Stream Reader can't be null");
+        if (outputStream == null) {
+            IllegalArgumentException e = new IllegalArgumentException("OutputStream can't be null");
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw e;
         }
-
-        String className = readNameOfClass(reader);
-        if (!className.equals("")) {
-
-            if (className.equals(Battery.class.getName())) {
-                Battery battery = new Battery();
-                readDevices(battery, reader);
-                battery.setChargeVolume(Integer.parseInt(readDevValue(reader)));
-                reader.read();
-                return battery;
-            }
-
-            if (className.equals(Router.class.getName())) {
-                Router router = new Router();
-                readDevices(router, reader);
-                router.setDataRate(Integer.parseInt(readDevValue(reader)));
-                reader.read();
-                return router;
-            }
-
-            if (className.equals(Switch.class.getName())) {
-                Switch aSwitch = new Switch();
-                readDevices(aSwitch, reader);
-                aSwitch.setDataRate(Integer.parseInt(readDevValue(reader)));
-                aSwitch.setNumberOfPorts(Integer.parseInt(readDevValue(reader)));
-                reader.read();
-                return aSwitch;
-            }
-
-            if (className.equals(WifiRouter.class.getName())) {
-                WifiRouter wifiRouter = new WifiRouter();
-                readDevices(wifiRouter, reader);
-                wifiRouter.setDataRate(Integer.parseInt(readDevValue(reader)));
-                String securityProtocol = readDevValue(reader);
-                wifiRouter.setSecurityProtocol(securityProtocol);
-                reader.read();
-                return wifiRouter;
-            }
-        }
-        ClassNotFoundException e = new ClassNotFoundException("Class not found");
-        LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        throw e;
+        ObjectOutputStream out = new ObjectOutputStream(outputStream);
+        out.writeObject(rack);
     }
 
-    private String readNameOfClass(Reader reader) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        int read = reader.read();
-        while (read != '\n') {
-            stringBuilder.append((char) read);
-            read = reader.read();
+    public Rack deserializeRack(InputStream inputStream)
+            throws IOException, ClassCastException, ClassNotFoundException {
+        if (inputStream == null) {
+            IllegalArgumentException e = new IllegalArgumentException("InputStream can't be null");
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
         }
-        return stringBuilder.toString();
-    }
-
-    private String formatString(String string) {
-        if (string == null)
-            return " |";
-        return " " + string + " |";
-    }
-
-    private Device setDevValues(Device device, DataInputStream dataInputStream) throws IOException {
-        int in = dataInputStream.readInt();
-        String module = dataInputStream.readUTF(dataInputStream);
-        String manufacturer = dataInputStream.readUTF(dataInputStream);
-        long productionDate = dataInputStream.readLong();
-
-        if (in > 0) {
-            device.setIn(in);
-        }
-        device.setModel(module.equals("\n") ? null : module);
-        device.setManufacturer(manufacturer.equals("\n") ? null : manufacturer);
-        device.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
-
-        return device;
-    }
-
-
-    private void readDevices(Device device, Reader reader) throws IOException {
-        Integer in = Integer.parseInt(readDevValue(reader));
-        readDevValue(reader);
-        String model = readDevValue(reader);
-        String manufacture = readDevValue(reader);
-        Long productionDate = Long.parseLong(readDevValue(reader));
-        if (in != 0) {
-            device.setIn(in);
-        }
-        device.setModel(model);
-        device.setManufacturer(manufacture);
-        device.setProductionDate(productionDate == -1 ? null : new Date(productionDate));
-    }
-
-    private String readDevValue(Reader reader) {
-        StringBuilder stringBuilder = new StringBuilder();
-        int read = 0;
-        try {
-            read = reader.read();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        while (read != '|') {
-            stringBuilder.append((char) read);
-            try {
-                read = reader.read();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        stringBuilder.deleteCharAt(0);
-        if (stringBuilder.length() > 0) {
-            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        } else {
-            return null;
-        }
-        return stringBuilder.toString();
+        ObjectInputStream in = new ObjectInputStream(inputStream);
+        Rack rack = (Rack) in.readObject();
+        return rack;
     }
 
     public void writeRack(Rack rack, Writer writer) throws IOException {
@@ -315,14 +275,13 @@ class InputOutputOperations {
         }
     }
 
-
-    public Rack readRack(Reader reader) throws IOException {
+    public Rack readRack(Reader reader) throws IOException, ClassNotFoundException {
         if (reader == null) {
             IllegalArgumentException e = new IllegalArgumentException("Stream Reader can't be null");
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "an exception was thrown", e);
             throw e;
         }
-        service.readLocation(reader);
+        Location location = service.readLocation(reader);
         String rackSize = "";
         String rackType = "";
         int data = reader.read();
@@ -340,26 +299,19 @@ class InputOutputOperations {
         int size = Integer.parseInt(rackSize);
         rackType = rackType.trim();
         DeviceService deviceService = new DeviceServiceImpl();
-        RackArrayImpl rack = null;
-        try {
-            rack = new RackArrayImpl(size, Class.forName(rackType));
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
+        RackArrayImpl rack = new RackArrayImpl(size, Class.forName(rackType));
+        rack.setLocation(location);
+
         for (int i = 0; i < size; i++) {
-            Device device = null;
-            try {
-                device = deviceService.readDevice(reader);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+            Device device = deviceService.readDevice(reader);
             if (device != null) {
                 rack.insertDevToSlot(device, i);
             }
         }
+
         return rack;
     }
-
 
     public void outputRack(Rack rack, OutputStream outputStream) throws IOException {
         if (rack == null) {
@@ -376,7 +328,6 @@ class InputOutputOperations {
         dataOutputStream.writeInt(rack.getSize());
         dataOutputStream.writeUTF(rack.getTypeOfDevices().getName());
 
-
         DeviceServiceImpl deviceService = new DeviceServiceImpl();
 
         for (int i = 0; i < rack.getSize(); i++) {
@@ -389,20 +340,19 @@ class InputOutputOperations {
         }
     }
 
-
     public Rack inputRack(InputStream inputStream) throws IOException, ClassNotFoundException {
         if (inputStream == null) {
             IllegalArgumentException illegalArgumentException = new IllegalArgumentException("InputStream cannot be null");
             LOGGER.log(Level.SEVERE, illegalArgumentException.getMessage(), illegalArgumentException);
             throw illegalArgumentException;
         }
-
+        Location location = service.inputLocation(inputStream);
         DataInputStream dataInputStream = new DataInputStream(inputStream);
         DeviceServiceImpl deviceService = new DeviceServiceImpl();
         int size = dataInputStream.readInt();
         Class typeClazz = Class.forName(dataInputStream.readUTF());
         Rack rack = new RackArrayImpl(size, typeClazz);
-        service.inputLocation(inputStream);
+        rack.setLocation(location);
         for (int i = 0; i < rack.getSize(); i++) {
             if (!dataInputStream.readUTF().equals("\n")) {
                 Device device = deviceService.inputDevice(dataInputStream);
@@ -412,34 +362,99 @@ class InputOutputOperations {
         return rack;
     }
 
+    private FeelableEntity.Field[] setDevValues(DataInputStream dataInputStream) throws IOException {
+        int in = dataInputStream.readInt();
+        String type = dataInputStream.readUTF(dataInputStream);
+        String module = dataInputStream.readUTF(dataInputStream);
+        String manufacturer = dataInputStream.readUTF(dataInputStream);
+        long productionDate = dataInputStream.readLong();
 
-    public void serializeRack(Rack rack, OutputStream outputStream) throws IOException {
-        if (rack == null) {
-            return;
-        }
+        FeelableEntity.Field[] fields = new FeelableEntity.Field[5];
+        fields[0] = new FeelableEntity.Field(Integer.class, in);
+        fields[3] = new FeelableEntity.Field(String.class, module.equals("\\") ? null : module);
+        fields[2] = new FeelableEntity.Field(String.class, manufacturer.equals("\\") ? null : manufacturer);
+        fields[4] = new FeelableEntity.Field(Date.class, productionDate == -1 ? null : new Date(productionDate));
 
-        if (outputStream == null) {
-            IllegalArgumentException e = new IllegalArgumentException("OutputStream can't be null");
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw e;
-        }
-
-        ObjectOutputStream out = new ObjectOutputStream(outputStream);
-        out.writeObject(rack);
+        return fields;
     }
 
+    private FeelableEntity.Field[] setDevValues(String objectValue, Class clazz) throws IOException {
 
-    public Rack deserializeRack(InputStream inputStream)
-            throws IOException, ClassCastException, ClassNotFoundException {
-        if (inputStream == null) {
-            IllegalArgumentException e = new IllegalArgumentException("InputStream can't be null");
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw e;
+        FeelableEntity.Field[] fields = new FeelableEntity.Field[7];
+        String[] valueOfDevice = objectValue.split("\\|");
+        String extendValue = null;
+        String inTypeValue = null;
+        int i = 0;
+        for (; i < valueOfDevice.length; i++) {
+            if (valueOfDevice[i].contains("[")) {
+                inTypeValue = valueOfDevice[i].concat(" ").concat(valueOfDevice[i + 1]);
+                break;
+            }
         }
 
-        ObjectInputStream in = new ObjectInputStream(inputStream);
-        Rack rack = (Rack) in.readObject();
+        CharArrayReader charArrayReader = new CharArrayReader(inTypeValue.toCharArray());
+        StreamTokenizer streamTokenizer = new StreamTokenizer(charArrayReader);
+        streamTokenizer.whitespaceChars(91, 93);
+        if (streamTokenizer.nextToken() != StreamTokenizer.TT_EOL || streamTokenizer.ttype == 32) {
+            fields[0] = new FeelableEntity.Field(Integer.class, (int) streamTokenizer.nval);
+        }
 
-        return rack;
+        for (; i < valueOfDevice.length; i++) {
+            if (i == 1) {
+                fields[3] = parsStringReader(valueOfDevice[1]);
+            }
+            if (i == 2) {
+                fields[2] = parsStringReader(valueOfDevice[2]);
+            }
+            if (i == 3) {
+                fields[4] = parsDateReader(valueOfDevice[3]);
+                i++;
+                break;
+            }
+        }
+
+        if (clazz.isInstance(new Battery())) {
+            fields[5] = parsIntReader(valueOfDevice[i]);
+            return fields;
+        }
+        if (clazz.isInstance(new Router())) {
+            fields[5] = parsIntReader(valueOfDevice[i]);
+            return fields;
+        }
+        if (clazz.isInstance(new Switch())) {
+            fields[5] = parsIntReader(valueOfDevice[i]);
+            i++;
+            fields[6] = parsIntReader(valueOfDevice[i]);
+            return fields;
+        }
+        if (clazz.isInstance(new WifiRouter())) {
+            fields[5] = parsIntReader(valueOfDevice[i]);
+            i++;
+            fields[6] = parsStringReader(valueOfDevice[i]);
+            return fields;
+        }
+        return fields;
+    }
+
+    private FeelableEntity.Field parsDateReader(String valueField) {
+        if (valueField.contains("-1")) {
+            return new FeelableEntity.Field(Date.class, null);
+        } else {
+            return new FeelableEntity.Field(Date.class, new Date((long) Long.parseLong(valueField.trim())));
+        }
+    }
+
+    private FeelableEntity.Field parsStringReader(String valueField) {
+        if (valueField.equals(" ")) {
+            return new FeelableEntity.Field(String.class, null);
+        } else if (valueField.length() == 2) {
+            return new FeelableEntity.Field(String.class, valueField.trim());
+        } else {
+            return new FeelableEntity.Field(String.class, valueField.substring(1, valueField.length() - 1));
+        }
+    }
+
+    private FeelableEntity.Field parsIntReader(String valueField) {
+        return new FeelableEntity.Field(Integer.class, Integer.parseInt(valueField.trim()));
     }
 }

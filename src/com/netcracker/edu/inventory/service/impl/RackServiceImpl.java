@@ -4,21 +4,18 @@ import com.netcracker.edu.inventory.model.Rack;
 import com.netcracker.edu.inventory.service.RackService;
 
 import java.io.*;
-import java.util.logging.Logger;
 
 class RackServiceImpl implements RackService {
-    static protected Logger LOGGER = Logger.getLogger(RackServiceImpl.class.getName());
-    private InputOutputOperations inputOutputOperations;
 
+    private InputOutputOperations inputOutputOperations = new InputOutputOperations();
 
     @Override
     public void writeRack(Rack rack, Writer writer) throws IOException {
         inputOutputOperations.writeRack(rack, writer);
     }
 
-
     @Override
-    public Rack readRack(Reader reader) throws IOException {
+    public Rack readRack(Reader reader) throws IOException, ClassNotFoundException {
         return inputOutputOperations.readRack(reader);
     }
 
@@ -38,9 +35,7 @@ class RackServiceImpl implements RackService {
     }
 
     @Override
-    public Rack deserializeRack(InputStream inputStream)
-            throws IOException, ClassCastException, ClassNotFoundException {
+    public Rack deserializeRack(InputStream inputStream) throws IOException, ClassCastException, ClassNotFoundException {
         return inputOutputOperations.deserializeRack(inputStream);
     }
-
 }

@@ -8,43 +8,23 @@ import java.util.logging.Logger;
 
 class DeviceServiceImpl implements DeviceService {
 
-    static protected Logger LOGGER = Logger.getLogger(DeviceServiceImpl.class.getName());
-    private DeviceValidator deviceValidator;
-    private InputOutputOperations inputOutputOperations;
+    private static Logger LOGGER = Logger.getLogger(DeviceServiceImpl.class.getName());
+    private DeviceValidator deviceValidator = new DeviceValidator();
+    private InputOutputOperations inputOutputOperations = new InputOutputOperations();
 
     @Override
     public boolean isCastableTo(Device device, Class clazz) {
-        if (device == null || clazz == null) {
-            return false;
+        if (device != null && clazz != null) {
+            if (clazz.isInstance(device)) {
+                return true;
+            }
         }
-        return clazz.isInstance(device);
+        return false;
     }
 
     @Override
     public boolean isValidDeviceForInsertToRack(Device device) {
         return deviceValidator.isValidDeviceForInsertToRack(device);
-    }
-
-    @Override
-    public void outputDevice(Device device, OutputStream outputStream) throws IOException {
-        inputOutputOperations.outputDevice(device, outputStream);
-    }
-
-    @Override
-    public Device inputDevice(InputStream inputStream) throws IOException, ClassNotFoundException {
-        return inputOutputOperations.inputDevice(inputStream);
-    }
-
-
-    @Override
-    public void serializeDevice(Device device, OutputStream outputStream) throws IOException {
-        inputOutputOperations.serializeDevice(device, outputStream);
-    }
-
-    @Override
-    public Device deserializeDevice(InputStream inputStream)
-            throws IOException, ClassCastException, ClassNotFoundException {
-        return inputOutputOperations.deserializeDevice(inputStream);
     }
 
     @Override
@@ -62,5 +42,23 @@ class DeviceServiceImpl implements DeviceService {
         return inputOutputOperations.readDevice(reader);
     }
 
+    @Override
+    public void outputDevice(Device device, OutputStream outputStream) throws IOException {
+        inputOutputOperations.outputDevice(device, outputStream);
+    }
 
+    @Override
+    public Device inputDevice(InputStream inputStream) throws IOException, ClassNotFoundException {
+        return inputOutputOperations.inputDevice(inputStream);
+    }
+
+    @Override
+    public void serializeDevice(Device device, OutputStream outputStream) throws IOException {
+        inputOutputOperations.serializeDevice(device, outputStream);
+    }
+
+    @Override
+    public Device deserializeDevice(InputStream inputStream) throws IOException, ClassCastException, ClassNotFoundException {
+        return inputOutputOperations.deserializeDevice(inputStream);
+    }
 }

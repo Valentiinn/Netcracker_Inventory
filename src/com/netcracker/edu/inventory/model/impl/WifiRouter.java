@@ -17,16 +17,14 @@ public class WifiRouter extends Router implements Device {
     @Override
     public void feelAllFields(Field[] fields) {
         super.feelAllFields(fields);
-        if (fields[8].getType() == Integer.class) {
-            securityProtocol = (String) fields[8].getValue();
-        }
+        setSecurityProtocol((String) fields[6].getValue());
     }
 
     @Override
     public Field[] getAllFields() {
-        Field[] fields = new Field[9];
-        System.arraycopy(super.getAllFields(), 0, fields, 0, 8);
-        fields[8] = new Field(Integer.class, getSecurityProtocol());
+        Field[] fields = new Field[7];
+        System.arraycopy(super.getAllFields(), 0, fields, 0, 6);
+        fields[6] = new Field(Integer.class, getSecurityProtocol());
         return fields;
     }
 }

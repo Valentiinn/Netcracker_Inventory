@@ -17,16 +17,14 @@ public class Switch extends Router implements Device {
     @Override
     public void feelAllFields(Field[] fields) {
         super.feelAllFields(fields);
-        if (fields[7].getType() == Integer.class) {
-            numberOfPorts = (Integer) fields[7].getValue();
-        }
+        setNumberOfPorts((Integer) fields[6].getValue());
     }
 
     @Override
     public Field[] getAllFields() {
-        Field[] fields = new Field[8];
-        System.arraycopy(super.getAllFields(), 0, fields, 0, 7);
-        fields[7] = new Field(Integer.class, getNumberOfPorts());
+        Field[] fields = new Field[7];
+        System.arraycopy(super.getAllFields(), 0, fields, 0, 6);
+        fields[6] = new Field(Integer.class, getNumberOfPorts());
         return fields;
     }
 }

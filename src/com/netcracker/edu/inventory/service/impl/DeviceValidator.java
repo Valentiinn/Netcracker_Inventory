@@ -2,10 +2,11 @@ package com.netcracker.edu.inventory.service.impl;
 
 import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.model.impl.WifiRouter;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DeviceValidator {
+class DeviceValidator {
     static protected Logger LOGGER = Logger.getLogger(DeviceServiceImpl.class.getName());
 
     public boolean isValidDeviceForInsertToRack(Device device) {
@@ -20,7 +21,6 @@ public class DeviceValidator {
         if (device == null) {
             return false;
         }
-
         StringBuilder builder = new StringBuilder();
         builder.append(device.getType());
         builder.append(device.getModel());

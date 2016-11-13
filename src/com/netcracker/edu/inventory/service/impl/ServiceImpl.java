@@ -4,12 +4,13 @@ import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.service.DeviceService;
 import com.netcracker.edu.inventory.service.RackService;
 import com.netcracker.edu.inventory.service.Service;
+
 import java.util.logging.Logger;
 
 public class ServiceImpl implements Service {
 
     static private Logger LOGGER = Logger.getLogger(ServiceImpl.class.getName());
-    private Utilities utilities;
+    private Utilities utilities = new Utilities();
 
     @Override
     public DeviceService getDeviceService() {

@@ -18,15 +18,15 @@ public class Router extends AbstractDevice implements Device {
     @Override
     public void feelAllFields(Field[] fields) {
         super.feelAllFields(fields);
-        setDataRate((Integer) fields[6].getValue());
+        setDataRate((Integer) fields[5].getValue());
     }
 
     @Override
     public Field[] getAllFields() {
-        Field[] fields = new Field[7];
-        System.arraycopy(super.getAllFields(), 0, fields, 0, 6);
+        Field[] fields = new Field[6];
+        System.arraycopy(super.getAllFields(), 0, fields, 0, 5);
         Field dataRate = new Field(Integer.class, getDataRate());
-        fields[6] = dataRate;
+        fields[5] = dataRate;
         return fields;
     }
 }
