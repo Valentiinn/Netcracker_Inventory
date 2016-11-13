@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 class DeviceServiceImpl implements DeviceService {
 
-    private static Logger LOGGER = Logger.getLogger(DeviceServiceImpl.class.getName());
     private DeviceValidator deviceValidator = new DeviceValidator();
     private InputOutputOperations inputOutputOperations = new InputOutputOperations();
 

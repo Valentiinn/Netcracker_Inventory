@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 class DeviceValidator {
+
     static protected Logger LOGGER = Logger.getLogger(DeviceServiceImpl.class.getName());
 
     public boolean isValidDeviceForInsertToRack(Device device) {

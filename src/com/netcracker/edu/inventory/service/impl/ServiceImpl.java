@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 public class ServiceImpl implements Service {
 
-    static private Logger LOGGER = Logger.getLogger(ServiceImpl.class.getName());
     private Utilities utilities = new Utilities();
 
     @Override
