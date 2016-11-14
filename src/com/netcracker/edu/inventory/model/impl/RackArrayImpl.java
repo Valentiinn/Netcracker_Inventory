@@ -55,7 +55,6 @@ public class RackArrayImpl<T extends Device> implements Rack<T>, Serializable {
         return freeSize;
     }
 
-    @Deprecated
     @Override
     public Class<T> getTypeOfDevices() {
         return clazz;
