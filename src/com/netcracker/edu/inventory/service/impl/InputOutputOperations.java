@@ -380,7 +380,6 @@ class InputOutputOperations {
 
         FeelableEntity.Field[] fields = new FeelableEntity.Field[7];
         String[] valueOfDevice = objectValue.split("\\|");
-        String extendValue = null;
         String inTypeValue = null;
         int i = 0;
         for (; i < valueOfDevice.length; i++) {
@@ -389,14 +388,12 @@ class InputOutputOperations {
                 break;
             }
         }
-
         CharArrayReader charArrayReader = new CharArrayReader(inTypeValue.toCharArray());
         StreamTokenizer streamTokenizer = new StreamTokenizer(charArrayReader);
         streamTokenizer.whitespaceChars(91, 93);
         if (streamTokenizer.nextToken() != StreamTokenizer.TT_EOL || streamTokenizer.ttype == 32) {
             fields[0] = new FeelableEntity.Field(Integer.class, (int) streamTokenizer.nval);
         }
-
         for (; i < valueOfDevice.length; i++) {
             if (i == 1) {
                 fields[3] = parsStringReader(valueOfDevice[1]);
@@ -410,7 +407,6 @@ class InputOutputOperations {
                 break;
             }
         }
-
         if (clazz.getName().equals(Battery.class.getName())) {
             fields[5] = parsIntReader(valueOfDevice[i]);
             return fields;
