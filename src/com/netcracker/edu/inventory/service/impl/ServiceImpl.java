@@ -5,8 +5,6 @@ import com.netcracker.edu.inventory.service.DeviceService;
 import com.netcracker.edu.inventory.service.RackService;
 import com.netcracker.edu.inventory.service.Service;
 
-import java.util.logging.Logger;
-
 public class ServiceImpl implements Service {
 
     private Utilities utilities = new Utilities();

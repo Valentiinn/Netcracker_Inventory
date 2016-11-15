@@ -69,7 +69,7 @@ public interface DeviceService {
      * @param inputStream - source binary stream
      * @return - received Device instance
      */
-    Device inputDevice(InputStream inputStream) throws IOException, ClassNotFoundException;
+    Device inputDevice(InputStream inputStream) throws IOException, ClassNotFoundException, NoSuchFieldException;
 
     /**
      * Serialize Device instance in to binary stream

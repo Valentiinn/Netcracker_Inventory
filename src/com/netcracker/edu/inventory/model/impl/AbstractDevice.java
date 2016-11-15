@@ -81,16 +81,11 @@ abstract class AbstractDevice implements Device, Serializable {
     @Override
     public Field[] getAllFields() {
         Field[] fields = new Field[5];
-        Field in = new Field(Integer.class, getIn());
-        Field manufacturer = new Field(Integer.class, getManufacturer());
-        Field model = new Field(Integer.class, getModel());
-        Field productionDate = new Field(Integer.class, getProductionDate());
-        Field type = new Field(Integer.class, getType());
-        fields[0] = in;
-        fields[1] = type;
-        fields[2] = manufacturer;
-        fields[3] = model;
-        fields[4] = productionDate;
+        fields[0] = new Field(Integer.class, getIn());
+        fields[1] = new Field(Integer.class, getType());
+        fields[2] = new Field(Integer.class, getManufacturer());
+        fields[3] = new Field(Integer.class, getModel());
+        fields[4] = new Field(Integer.class, getProductionDate());
         return fields;
     }
 }

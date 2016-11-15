@@ -42,19 +42,15 @@ class InputOutputOperations {
         dataOutputStream.writeLong(fields[4].getValue() == null ? -1 : ((Date) fields[4].getValue()).getTime());
 
         if (Battery.class.isInstance(device)) {
-            Battery battery = (Battery) device;
             dataOutputStream.writeInt((Integer) fields[5].getValue());
         }
         if (Router.class.isInstance(device)) {
-            Router router = (Router) device;
             dataOutputStream.writeInt((Integer) fields[5].getValue());
         }
         if (Switch.class.isInstance(device)) {
-            Switch aSwitch = (Switch) device;
             dataOutputStream.writeInt((Integer) fields[6].getValue());
         }
         if (WifiRouter.class.isInstance(device)) {
-            WifiRouter wifiRouter = (WifiRouter) device;
             dataOutputStream.writeUTF(fields[6].getValue() == null ? "\n" : (String) fields[6].getValue());
         }
     }
@@ -67,7 +63,7 @@ class InputOutputOperations {
         }
         DataInputStream dataInputStream = new DataInputStream(inputStream);
         Class clazz = Class.forName(dataInputStream.readUTF());
-        if (clazz.isInstance(new Battery())) {
+        if (clazz.getName().equals(Battery.class.getName())) {
             Battery battery = new Battery();
             FeelableEntity.Field[] fields = new FeelableEntity.Field[6];
             System.arraycopy(setDevValues(dataInputStream), 0, fields, 0, 5);
@@ -75,7 +71,7 @@ class InputOutputOperations {
             fields[5] = new FeelableEntity.Field(Integer.class, chargeVolume);
             battery.feelAllFields(fields);
             return battery;
-        } else if (clazz.isInstance(new Router())) {
+        } else if (clazz.getName().equals(Router.class.getName())) {
             Router router = new Router();
             FeelableEntity.Field[] fields = new FeelableEntity.Field[6];
             System.arraycopy(setDevValues(dataInputStream), 0, fields, 0, 5);
@@ -83,7 +79,7 @@ class InputOutputOperations {
             fields[5] = new FeelableEntity.Field(Integer.class, dateRate);
             router.feelAllFields(fields);
             return router;
-        } else if (clazz.isInstance(new Switch())) {
+        } else if (clazz.getName().equals(Switch.class.getName())) {
             Switch aSwitch = new Switch();
             FeelableEntity.Field[] fields = new FeelableEntity.Field[7];
             System.arraycopy(setDevValues(dataInputStream), 0, fields, 0, 5);
@@ -93,7 +89,7 @@ class InputOutputOperations {
             fields[6] = new FeelableEntity.Field(Integer.class, numberOfPorts);
             aSwitch.feelAllFields(fields);
             return aSwitch;
-        } else if (clazz.isInstance(new WifiRouter())) {
+        } else if (clazz.getName().equals(WifiRouter.class.getName())) {
             WifiRouter wifiRouter = new WifiRouter();
             FeelableEntity.Field[] fields = new FeelableEntity.Field[7];
             System.arraycopy(setDevValues(dataInputStream), 0, fields, 0, 5);
@@ -126,18 +122,15 @@ class InputOutputOperations {
             writer.write(fields[2].getValue() == null ? "| " : (String) fields[2].getValue() + " | ");
             writer.write(device.getProductionDate() == null ? -1 + " | " : ((Date) fields[4].getValue()).getTime() + " | ");
             if (Battery.class.isInstance(device)) {
-                Battery battery = (Battery) device;
                 writer.write(fields[5].getValue() + " |");
             } else if (Router.class.isInstance(device)) {
                 Router router = (Router) device;
                 writer.write(fields[5].getValue() + " |");
                 if (WifiRouter.class.isInstance(router)) {
-                    WifiRouter wifiRouter = (WifiRouter) router;
                     writer.write(" ");
                     writer.write(fields[6].getValue() == null ? "|" : (String) fields[6].getValue() + " |");
                 } else if (Switch.class.isInstance(router)) {
-                    Switch aSwitch = (Switch) router;
-                    writer.write(" " + (Integer) fields[6].getValue() + " |");
+                    writer.write(" " + fields[6].getValue() + " |");
                 }
             }
             writer.write("\n");
@@ -175,22 +168,22 @@ class InputOutputOperations {
         }
         value = objectBuilder.toString();
         FeelableEntity.Field[] fields = setDevValues(value, clazz);
-        if (clazz.isInstance(new Battery())) {
+        if (clazz.getName().equals(Battery.class.getName())) {
             Battery battery = new Battery();
             battery.feelAllFields(fields);
             return battery;
         }
-        if (clazz.isInstance(new Router())) {
+        if (clazz.getName().equals(Router.class.getName())) {
             Router router = new Router();
             router.feelAllFields(fields);
             return router;
         }
-        if (clazz.isInstance(new Switch())) {
+        if (clazz.getName().equals(Switch.class.getName())) {
             Switch aSwitch = new Switch();
             aSwitch.feelAllFields(fields);
             return aSwitch;
         }
-        if (clazz.isInstance(new WifiRouter())) {
+        if (clazz.getName().equals(WifiRouter.class.getName())) {
             WifiRouter wifiRouter = new WifiRouter();
             wifiRouter.feelAllFields(fields);
             return wifiRouter;
@@ -355,7 +348,12 @@ class InputOutputOperations {
         rack.setLocation(location);
         for (int i = 0; i < rack.getSize(); i++) {
             if (!dataInputStream.readUTF().equals("\n")) {
-                Device device = deviceService.inputDevice(dataInputStream);
+                Device device = null;
+                try {
+                    device = deviceService.inputDevice(dataInputStream);
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                }
                 rack.insertDevToSlot(device, i);
             }
         }
@@ -413,21 +411,21 @@ class InputOutputOperations {
             }
         }
 
-        if (clazz.isInstance(new Battery())) {
+        if (clazz.getName().equals(Battery.class.getName())) {
             fields[5] = parsIntReader(valueOfDevice[i]);
             return fields;
         }
-        if (clazz.isInstance(new Router())) {
+        if (clazz.getName().equals(Router.class.getName())) {
             fields[5] = parsIntReader(valueOfDevice[i]);
             return fields;
         }
-        if (clazz.isInstance(new Switch())) {
+        if (clazz.getName().equals(Switch.class.getName())) {
             fields[5] = parsIntReader(valueOfDevice[i]);
             i++;
             fields[6] = parsIntReader(valueOfDevice[i]);
             return fields;
         }
-        if (clazz.isInstance(new WifiRouter())) {
+        if (clazz.getName().equals(WifiRouter.class.getName())) {
             fields[5] = parsIntReader(valueOfDevice[i]);
             i++;
             fields[6] = parsStringReader(valueOfDevice[i]);

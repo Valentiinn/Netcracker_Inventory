@@ -40,7 +40,7 @@ public interface RackService {
      * @param inputStream - source binary stream
      * @return - received Rack instance
      */
-    Rack inputRack(InputStream inputStream) throws IOException, ClassNotFoundException;
+    Rack inputRack(InputStream inputStream) throws IOException, ClassNotFoundException, NoSuchFieldException;
 
     /**
      * Serialize Rack instance in to binary stream
