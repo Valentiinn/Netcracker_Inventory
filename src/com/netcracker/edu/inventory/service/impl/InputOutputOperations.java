@@ -278,31 +278,25 @@ class InputOutputOperations {
         String rackSize = "";
         String rackType = "";
         int data = reader.read();
-
         while (data != ' ') {
             rackSize += (char) data;
             data = reader.read();
         }
-
         while (data != '\n') {
             rackType += (char) data;
             data = reader.read();
         }
-
         int size = Integer.parseInt(rackSize);
         rackType = rackType.trim();
         DeviceService deviceService = new DeviceServiceImpl();
-
         RackArrayImpl rack = new RackArrayImpl(size, Class.forName(rackType));
         rack.setLocation(location);
-
         for (int i = 0; i < size; i++) {
             Device device = deviceService.readDevice(reader);
             if (device != null) {
                 rack.insertDevToSlot(device, i);
             }
         }
-
         return rack;
     }
 
@@ -310,7 +304,6 @@ class InputOutputOperations {
         if (rack == null) {
             return;
         }
-
         if (outputStream == null) {
             IllegalArgumentException illegalArgumentException = new IllegalArgumentException("OutputStream cannot be null");
             LOGGER.log(Level.SEVERE, illegalArgumentException.getMessage(), illegalArgumentException);
@@ -366,18 +359,15 @@ class InputOutputOperations {
         String module = dataInputStream.readUTF(dataInputStream);
         String manufacturer = dataInputStream.readUTF(dataInputStream);
         long productionDate = dataInputStream.readLong();
-
         FeelableEntity.Field[] fields = new FeelableEntity.Field[5];
         fields[0] = new FeelableEntity.Field(Integer.class, in);
         fields[3] = new FeelableEntity.Field(String.class, module.equals("\\") ? null : module);
         fields[2] = new FeelableEntity.Field(String.class, manufacturer.equals("\\") ? null : manufacturer);
         fields[4] = new FeelableEntity.Field(Date.class, productionDate == -1 ? null : new Date(productionDate));
-
         return fields;
     }
 
     private FeelableEntity.Field[] setDevValues(String objectValue, Class clazz) throws IOException {
-
         FeelableEntity.Field[] fields = new FeelableEntity.Field[7];
         String[] valueOfDevice = objectValue.split("\\|");
         String inTypeValue = null;
