@@ -47,7 +47,7 @@ class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public Device inputDevice(InputStream inputStream) throws IOException, ClassNotFoundException, NoSuchFieldException {
+    public Device inputDevice(InputStream inputStream) throws IOException, ClassNotFoundException {
         return inputOutputOperations.inputDevice(inputStream);
     }
 
