@@ -1,10 +1,10 @@
 package com.netcracker.edu.inventory.service.impl;
 
+import com.netcracker.edu.inventory.AssertUtilities;
+import com.netcracker.edu.inventory.CreateUtilities;
+import com.netcracker.edu.inventory.model.ConnectorType;
 import com.netcracker.edu.inventory.model.Device;
-import com.netcracker.edu.inventory.model.impl.Battery;
-import com.netcracker.edu.inventory.model.impl.Router;
-import com.netcracker.edu.inventory.model.impl.Switch;
-import com.netcracker.edu.inventory.model.impl.WifiRouter;
+import com.netcracker.edu.inventory.model.impl.*;
 import com.netcracker.edu.inventory.service.DeviceService;
 import com.netcracker.edu.location.Location;
 import com.netcracker.edu.location.impl.LocationStubImpl;
@@ -24,6 +24,11 @@ import static org.junit.Assert.assertEquals;
  * Created by oleksandr on 19.10.16.
  */
 public class DeviceServiceImplTest {
+
+    private static final int PIPED_BUFER_SIZE = 1024*4;
+    private static final String BINARY_FILE_NAME = "testOutDevice.bin";
+    private static final String TEXT_FILE_NAME = "testOutDevice.txt";
+    private static final String OBJECT_FILE_NAME = "testOutDevice.obj";
 
     DeviceService deviceService;
 
@@ -148,12 +153,12 @@ public class DeviceServiceImplTest {
     public void writeReadDevice() throws Exception {
 
         PipedWriter pipedWriter = new PipedWriter();
-        PipedReader pipedReader = new PipedReader(pipedWriter);
-        Battery battery = createBattery();
-        Router router = createRouter();
-        Switch aSwitch = createSwitch();
-        WifiRouter wifiRouter = createWifiRouter();
-        WifiRouter wifiRouter2 = createWifiRouter();
+        PipedReader pipedReader = new PipedReader(pipedWriter, PIPED_BUFER_SIZE);
+        Battery battery = CreateUtilities.createBattery();
+        Router router = CreateUtilities.createRouter();
+        Switch aSwitch = CreateUtilities.createSwitch();
+        WifiRouter wifiRouter = CreateUtilities.createWifiRouter();
+        WifiRouter wifiRouter2 = CreateUtilities.createWifiRouter();
         wifiRouter2.setSecurityProtocol("   ");
 
         deviceService.writeDevice(battery, pipedWriter);
@@ -171,17 +176,15 @@ public class DeviceServiceImplTest {
         pipedReader.close();
 
         assertEquals(Battery.class, result1.getClass());
-        assertBattery(battery, (Battery) result1);
+        AssertUtilities.assertBattery(battery, (Battery) result1);
         assertEquals(Router.class, result2.getClass());
-        assertRouter(router, (Router) result2);
+        AssertUtilities.assertRouter(router, (Router) result2);
         assertEquals(Switch.class, result3.getClass());
-        assertSwitch(aSwitch, (Switch) result3);
+        AssertUtilities.assertSwitch(aSwitch, (Switch) result3);
         assertEquals(WifiRouter.class, result4.getClass());
-        assertWifiRouter(wifiRouter, (WifiRouter) result4);
+        AssertUtilities.assertWifiRouter(wifiRouter, (WifiRouter) result4);
         assertEquals(WifiRouter.class, result5.getClass());
-        assertWifiRouter(wifiRouter2, (WifiRouter) result5);
-
-        writeToFile("testOut.txt");
+        AssertUtilities.assertWifiRouter(wifiRouter2, (WifiRouter) result5);
     }
 
     @Test
@@ -198,7 +201,7 @@ public class DeviceServiceImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void writeDeviceStreamNull() throws Exception {
-        deviceService.writeDevice(createSwitch(), null);
+        deviceService.writeDevice(CreateUtilities.createSwitch(), null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -209,11 +212,11 @@ public class DeviceServiceImplTest {
     @Test
     public void outputInputDevice() throws Exception {
         PipedOutputStream pipedOutputStream = new PipedOutputStream();
-        PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream);
-        Battery battery = createBattery();
-        Router router = createRouter();
-        Switch aSwitch = createSwitch();
-        WifiRouter wifiRouter = createWifiRouter();
+        PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream, PIPED_BUFER_SIZE);
+        Battery battery = CreateUtilities.createBattery();
+        Router router = CreateUtilities.createRouter();
+        Switch aSwitch = CreateUtilities.createSwitch();
+        WifiRouter wifiRouter = CreateUtilities.createWifiRouter();
 
         deviceService.outputDevice(battery, pipedOutputStream);
         deviceService.outputDevice(router, pipedOutputStream);
@@ -228,15 +231,13 @@ public class DeviceServiceImplTest {
         pipedInputStream.close();
 
         assertEquals(Battery.class, result1.getClass());
-        assertBattery(battery, (Battery) result1);
+        AssertUtilities.assertBattery(battery, (Battery) result1);
         assertEquals(Router.class, result2.getClass());
-        assertRouter(router, (Router) result2);
+        AssertUtilities.assertRouter(router, (Router) result2);
         assertEquals(Switch.class, result3.getClass());
-        assertSwitch(aSwitch, (Switch) result3);
+        AssertUtilities.assertSwitch(aSwitch, (Switch) result3);
         assertEquals(WifiRouter.class, result4.getClass());
-        assertWifiRouter(wifiRouter, (WifiRouter) result4);
-
-//        outputToFile("testOut.bin");
+        AssertUtilities.assertWifiRouter(wifiRouter, (WifiRouter) result4);
     }
 
     @Test
@@ -253,7 +254,7 @@ public class DeviceServiceImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void outputDeviceStreamNull() throws Exception {
-        deviceService.outputDevice(createSwitch(), null);
+        deviceService.outputDevice(CreateUtilities.createSwitch(), null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -264,11 +265,11 @@ public class DeviceServiceImplTest {
     @Test
     public void serializeDeserializeDevice() throws Exception {
         PipedOutputStream pipedOutputStream = new PipedOutputStream();
-        PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream, 2048);
-        Battery battery = createBattery();
-        Router router = createRouter();
-        Switch aSwitch = createSwitch();
-        WifiRouter wifiRouter = createWifiRouter();
+        PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream, PIPED_BUFER_SIZE);
+        Battery battery = CreateUtilities.createBattery();
+        Router router = CreateUtilities.createRouter();
+        Switch aSwitch = CreateUtilities.createSwitch();
+        WifiRouter wifiRouter = CreateUtilities.createWifiRouter();
 
         deviceService.serializeDevice(battery, pipedOutputStream);
         deviceService.serializeDevice(router, pipedOutputStream);
@@ -283,15 +284,13 @@ public class DeviceServiceImplTest {
         pipedInputStream.close();
 
         assertEquals(Battery.class, result1.getClass());
-        assertBattery(battery, (Battery) result1);
+        AssertUtilities.assertBattery(battery, (Battery) result1);
         assertEquals(Router.class, result2.getClass());
-        assertRouter(router, (Router) result2);
+        AssertUtilities.assertRouter(router, (Router) result2);
         assertEquals(Switch.class, result3.getClass());
-        assertSwitch(aSwitch, (Switch) result3);
+        AssertUtilities.assertSwitch(aSwitch, (Switch) result3);
         assertEquals(WifiRouter.class, result4.getClass());
-        assertWifiRouter(wifiRouter, (WifiRouter) result4);
-
-//        serializeToFile("testOut.obj");
+        AssertUtilities.assertWifiRouter(wifiRouter, (WifiRouter) result4);
     }
 
     @Test
@@ -308,7 +307,7 @@ public class DeviceServiceImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void serializeDeviceStreamNull() throws Exception {
-        deviceService.serializeDevice(createSwitch(), null);
+        deviceService.serializeDevice(CreateUtilities.createSwitch(), null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -316,76 +315,13 @@ public class DeviceServiceImplTest {
         deviceService.deserializeDevice(null);
     }
 
-    public static Battery createBattery() {
-        Battery battery = new Battery();
-        battery.setIn(4);
-        battery.setManufacturer("");
-        battery.setModel("qwerty");
-        battery.setProductionDate(new Date());
-        battery.setChargeVolume(5000);
-        return battery;
-    }
-
-    public static Router createRouter() {
-        Router router = new Router();
-        router.setManufacturer("D-link");
-        router.setDataRate(1000);
-        return router;
-    }
-
-    public static Switch createSwitch() {
-        Switch aSwitch = new Switch();
-        aSwitch.setIn(7);
-        aSwitch.setModel("null");
-        aSwitch.setManufacturer("Cisco");
-        aSwitch.setDataRate(1000000);
-        aSwitch.setNumberOfPorts(16);
-        return aSwitch;
-    }
-
-    public static WifiRouter createWifiRouter() {
-        WifiRouter wifiRouter = new WifiRouter();
-        wifiRouter.setIn(7);
-        wifiRouter.setModel(null);
-        wifiRouter.setManufacturer("D-link");
-        wifiRouter.setSecurityProtocol(" ");
-        return wifiRouter;
-    }
-
-    public static void assertDevice(Device expDevice, Device device) throws Exception {
-        assertEquals(expDevice.getIn(), device.getIn());
-        assertEquals(expDevice.getType(), device.getType());
-        assertEquals(expDevice.getModel(), device.getModel());
-        assertEquals(expDevice.getManufacturer(), device.getManufacturer());
-        assertEquals(expDevice.getProductionDate(), device.getProductionDate());
-    }
-
-    public static void assertBattery(Battery expBattery, Battery battery) throws Exception {
-        assertDevice(expBattery, battery);
-        assertEquals(expBattery.getChargeVolume(), battery.getChargeVolume());
-    }
-
-    public static void assertRouter(Router expRouter, Router router) throws Exception {
-        assertDevice(expRouter, router);
-        assertEquals(expRouter.getDataRate(), router.getDataRate());
-    }
-
-    public static void assertSwitch(Switch expSwitch, Switch aSwitch) throws Exception {
-        assertRouter(expSwitch, aSwitch);
-        assertEquals(expSwitch.getNumberOfPorts(), aSwitch.getNumberOfPorts());
-    }
-
-    public static void assertWifiRouter(WifiRouter expWifiRouter, WifiRouter wifiRouter) throws Exception {
-        assertRouter(expWifiRouter, wifiRouter);
-        assertEquals(expWifiRouter.getSecurityProtocol(), wifiRouter.getSecurityProtocol());
-    }
-
-    public void outputToFile(String fileName) throws Exception {
-        FileOutputStream fileOutputStream = new FileOutputStream(fileName);
-        Battery battery = createBattery();
-        Router router = createRouter();
-        Switch aSwitch = createSwitch();
-        WifiRouter wifiRouter = createWifiRouter();
+    @Test
+    public void outputToFile() throws Exception {
+        FileOutputStream fileOutputStream = new FileOutputStream(BINARY_FILE_NAME);
+        Battery battery = CreateUtilities.createBattery();
+        Router router = CreateUtilities.createRouter();
+        Switch aSwitch = CreateUtilities.createSwitch();
+        WifiRouter wifiRouter = CreateUtilities.createWifiRouter();
 
         deviceService.outputDevice(battery, fileOutputStream);
         deviceService.outputDevice(router, fileOutputStream);
@@ -394,12 +330,13 @@ public class DeviceServiceImplTest {
         fileOutputStream.close();
     }
 
-    public void writeToFile(String fileName) throws Exception {
-        FileWriter fileWriter = new FileWriter(fileName);
-        Battery battery = createBattery();
-        Router router = createRouter();
-        Switch aSwitch = createSwitch();
-        WifiRouter wifiRouter = createWifiRouter();
+    @Test
+    public void writeToFile() throws Exception {
+        FileWriter fileWriter = new FileWriter(TEXT_FILE_NAME);
+        Battery battery = CreateUtilities.createBattery();
+        Router router = CreateUtilities.createRouter();
+        Switch aSwitch = CreateUtilities.createSwitch();
+        WifiRouter wifiRouter = CreateUtilities.createWifiRouter();
 
         deviceService.writeDevice(battery, fileWriter);
         deviceService.writeDevice(router, fileWriter);
@@ -408,12 +345,13 @@ public class DeviceServiceImplTest {
         fileWriter.close();
     }
 
-    public void serializeToFile(String fileName) throws Exception {
-        FileOutputStream fileOutputStream = new FileOutputStream(fileName);
-        Battery battery = createBattery();
-        Router router = createRouter();
-        Switch aSwitch = createSwitch();
-        WifiRouter wifiRouter = createWifiRouter();
+    @Test
+    public void serializeToFile() throws Exception {
+        FileOutputStream fileOutputStream = new FileOutputStream(OBJECT_FILE_NAME);
+        Battery battery = CreateUtilities.createBattery();
+        Router router = CreateUtilities.createRouter();
+        Switch aSwitch = CreateUtilities.createSwitch();
+        WifiRouter wifiRouter = CreateUtilities.createWifiRouter();
 
         deviceService.serializeDevice(battery, fileOutputStream);
         deviceService.serializeDevice(router, fileOutputStream);

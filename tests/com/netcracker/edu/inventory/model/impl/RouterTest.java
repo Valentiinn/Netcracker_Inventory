@@ -1,5 +1,7 @@
 package com.netcracker.edu.inventory.model.impl;
 
+import com.netcracker.edu.inventory.AssertUtilities;
+import com.netcracker.edu.inventory.CreateUtilities;
 import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.service.impl.DeviceServiceImplTest;
 import org.junit.After;
@@ -35,22 +37,42 @@ public class RouterTest {
         assertEquals(dataRate, result);
     }
 
+    @Deprecated
     @Test
-    public void testGetAndFeelAllFields() throws Exception {
-        router = DeviceServiceImplTest.createRouter();
+    public void testGetAndFeelAllFieldsArray() throws Exception {
+        router = CreateUtilities.createRouter();
 
         Device result1 = new Router();
         result1.feelAllFields(router.getAllFields());
 
-        DeviceServiceImplTest.assertDevice(router, result1);
+        AssertUtilities.assertDevice(router, result1);
+    }
+
+    @Deprecated
+    @Test
+    public void testGetAndFeelAllFieldsArray_EmptyDevice() throws Exception {
+        Device result1 = new Router();
+        result1.feelAllFields(router.getAllFields());
+
+        AssertUtilities.assertDevice(router, result1);
+    }
+
+    @Test
+    public void testGetAndFeelAllFields() throws Exception {
+        router = CreateUtilities.createRouter();
+
+        Router result1 = new Router();
+        result1.fillAllFields(router.getAllFieldsList());
+
+        AssertUtilities.assertRouter(router, result1);
     }
 
     @Test
     public void testGetAndFeelAllFields_EmptyDevice() throws Exception {
-        Device result1 = new Router();
-        result1.feelAllFields(router.getAllFields());
+        Router result1 = new Router();
+        result1.fillAllFields(router.getAllFieldsList());
 
-        DeviceServiceImplTest.assertDevice(router, result1);
+        AssertUtilities.assertRouter(router, result1);
     }
 
 }

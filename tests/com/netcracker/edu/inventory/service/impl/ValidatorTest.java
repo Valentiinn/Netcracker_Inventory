@@ -2,8 +2,6 @@ package com.netcracker.edu.inventory.service.impl;
 
 import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.model.impl.Battery;
-import com.netcracker.edu.inventory.model.impl.Router;
-import com.netcracker.edu.inventory.model.impl.Switch;
 import com.netcracker.edu.inventory.model.impl.WifiRouter;
 import org.junit.After;
 import org.junit.Before;
@@ -16,13 +14,13 @@ import static org.junit.Assert.*;
  *
  * Created by makovetskyi on 11/4/2016.
  */
-public class UtilitiesTest {
+public class ValidatorTest {
 
-    Utilities utilities;
+    Validator validator;
 
     @Before
-    public void before() throws Exception {
-        utilities = new Utilities();
+    public void setUp() throws Exception {
+        validator = new Validator();
     }
 
     @After
@@ -31,13 +29,18 @@ public class UtilitiesTest {
     }
 
     @Test
-    public void sortByIN() throws Exception {
-        utilities.sortByIN(new Device[0]);
+    public void isValidDeviceForInsertToRack() throws Exception {
+        validator.isValidDeviceForInsertToRack(null);
     }
 
     @Test
-    public void filtrateByType() throws Exception {
-        utilities.filtrateByType(null, null);
+    public void isValidDeviceForWriteToStream() throws Exception {
+        validator.isValidDeviceForInsertToRack(null);
+    }
+
+    @Test
+    public void isValidConnectionForWriteToStream() throws Exception {
+        validator.isValidConnectionForWriteToStream(null);
     }
 
 }

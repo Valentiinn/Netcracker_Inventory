@@ -1,5 +1,6 @@
 package com.netcracker.edu.inventory.model.impl;
 
+import com.netcracker.edu.inventory.AssertUtilities;
 import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.service.impl.DeviceServiceImplTest;
 import org.junit.After;
@@ -83,27 +84,6 @@ public class AbstractDeviceTest {
         Date result = device.getProductionDate();
 
         assertEquals(productionDate, result);
-    }
-
-    @Test
-    public void testGetAndFeelAllFields() throws Exception {
-        device.setIn(5);
-        device.setModel("model");
-        device.setManufacturer("  ");
-        device.setProductionDate(new Date());
-
-        Device result1 = new AbstractDevice() {};
-        result1.feelAllFields(device.getAllFields());
-
-        DeviceServiceImplTest.assertDevice(device, result1);
-    }
-
-    @Test
-    public void testGetAndFeelAllFields_EmptyDevice() throws Exception {
-        Device result1 = new AbstractDevice() {};
-        result1.feelAllFields(device.getAllFields());
-
-        DeviceServiceImplTest.assertDevice(device, result1);
     }
 
 }

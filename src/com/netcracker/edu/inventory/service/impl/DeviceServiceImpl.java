@@ -4,11 +4,10 @@ import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.service.DeviceService;
 
 import java.io.*;
-import java.util.logging.Logger;
 
 class DeviceServiceImpl implements DeviceService {
 
-    private DeviceValidator deviceValidator = new DeviceValidator();
+    private Validator deviceValidator = new Validator();
     private InputOutputOperations inputOutputOperations = new InputOutputOperations();
 
     @Override

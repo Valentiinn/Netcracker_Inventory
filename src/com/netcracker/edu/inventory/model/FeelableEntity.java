@@ -1,13 +1,21 @@
 package com.netcracker.edu.inventory.model;
 
+import java.util.List;
+
 /**
  * Created by oleksandr on 01.11.16.
  */
 public interface FeelableEntity {
 
+    @Deprecated
     void feelAllFields(Field[] fields);
 
+    @Deprecated
     Field[] getAllFields();
+
+    void fillAllFields(List<Field> fields);
+
+    List<Field> getAllFieldsList();
 
     class Field {
 

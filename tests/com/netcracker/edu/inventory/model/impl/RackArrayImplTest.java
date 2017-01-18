@@ -6,14 +6,10 @@ import com.netcracker.edu.inventory.model.Rack;
 import com.netcracker.edu.inventory.service.impl.ServiceImpl;
 import com.netcracker.edu.location.Location;
 import com.netcracker.edu.location.impl.LocationStubImpl;
-import com.netcracker.edu.main.Main;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.util.logging.LogManager;
 
 import static org.junit.Assert.*;
 
