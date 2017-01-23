@@ -18,22 +18,6 @@ public class Battery extends AbstractDevice implements Device {
         this.chargeVolume = chargeVolume;
     }
 
-    @Deprecated
-    @Override
-    public void feelAllFields(Field[] fields) {
-        super.feelAllFields(fields);
-        setChargeVolume((Integer) fields[5].getValue());
-    }
-
-    @Deprecated
-    @Override
-    public Field[] getAllFields() {
-        Field[] fields = new Field[6];
-        System.arraycopy(super.getAllFields(), 0, fields, 0, 5);
-        fields[5] = new Field(Integer.class, getChargeVolume());
-        return fields;
-    }
-
     @Override
     public void fillAllFields(List<Field> fields) {
         Field chargeVolumeField = fields.get(fields.size() - 1);

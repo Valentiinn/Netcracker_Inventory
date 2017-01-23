@@ -18,24 +18,6 @@ public class Router extends AbstractDevice implements Device {
         this.dataRate = dataRate;
     }
 
-    @Deprecated
-    @Override
-    public void feelAllFields(Field[] fields) {
-        super.feelAllFields(fields);
-        setDataRate((Integer) fields[5].getValue());
-    }
-
-    @Deprecated
-    @Override
-    public Field[] getAllFields() {
-        Field[] fields = new Field[6];
-        System.arraycopy(super.getAllFields(), 0, fields, 0, 5);
-        Field dataRate = new Field(Integer.class, getDataRate());
-        fields[5] = dataRate;
-        return fields;
-    }
-
-
     @Override
     public void fillAllFields(List<Field> fields) {
         Field dataRate = fields.get(fields.size() - 1);

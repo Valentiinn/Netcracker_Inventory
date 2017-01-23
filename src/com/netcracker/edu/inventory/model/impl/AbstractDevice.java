@@ -73,24 +73,15 @@ abstract class AbstractDevice implements Device, Serializable {
     @Deprecated
     @Override
     public void feelAllFields(Field[] fields) {
-        if ((Integer) fields[0].getValue() > 0) {
-            setIn((Integer) fields[0].getValue());
-        }
-        setManufacturer((String) fields[2].getValue());
-        setModel((String) fields[3].getValue());
-        setProductionDate((Date) fields[4].getValue());
+        ArrayList<Field> fieldList = new ArrayList<Field>(Arrays.asList(fields));
+        fillAllFields(fieldList);
     }
 
     @Deprecated
     @Override
     public Field[] getAllFields() {
-        Field[] fields = new Field[5];
-        fields[0] = new Field(Integer.class, getIn());
-        fields[1] = new Field(Integer.class, getType());
-        fields[2] = new Field(Integer.class, getManufacturer());
-        fields[3] = new Field(Integer.class, getModel());
-        fields[4] = new Field(Integer.class, getProductionDate());
-        return fields;
+        List<Field> fieldList = getAllFieldsList();
+        return fieldList.toArray(new Field[fieldList.size()]);
     }
 
     @Override

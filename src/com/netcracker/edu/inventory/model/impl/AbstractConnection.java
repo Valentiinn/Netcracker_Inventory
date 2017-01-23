@@ -14,12 +14,14 @@ public class AbstractConnection implements Connection {
         this.status = PLANED;
     }
 
+    @Deprecated
     @Override
     public void feelAllFields(Field[] fields) {
         ArrayList<Field> list = new ArrayList<Field>(Arrays.asList(fields));
         fillAllFields(list);
     }
 
+    @Deprecated
     @Override
     public Field[] getAllFields() {
         List<Field> list = getAllFieldsList();

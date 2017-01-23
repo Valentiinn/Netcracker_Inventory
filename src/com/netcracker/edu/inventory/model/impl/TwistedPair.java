@@ -6,7 +6,7 @@ import com.netcracker.edu.inventory.model.Device;
 import java.util.List;
 
 
-public class TwistedPair<A extends Device, B extends Device> extends AbstractConnectionOneToOne<A,B> {
+public class TwistedPair<A extends Device, B extends Device> extends AbstractConnectionOneToOne<A, B> {
 
     public enum Type {
         need_init("<need_init>"),
@@ -21,6 +21,7 @@ public class TwistedPair<A extends Device, B extends Device> extends AbstractCon
         Type(String fullName) {
             this.fullName = fullName;
         }
+
         public String getFullName() {
             return fullName;
         }
@@ -43,7 +44,7 @@ public class TwistedPair<A extends Device, B extends Device> extends AbstractCon
 
     @Override
     public void fillAllFields(List<Field> fields) {
-        if(type == Type.need_init) {
+        if (type == Type.need_init) {
             Field typeField = fields.get(fields.size() - 1);
             type = (Type) typeField.getValue();
         }
