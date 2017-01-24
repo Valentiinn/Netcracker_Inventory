@@ -29,26 +29,25 @@ public class WifiRouter extends Router implements Device {
         Field technologyVersionField;
         Field wirePortTypeField;
         if (fields != null) {
-            securityProtocolField = fields.get(fields.size() - 1);
+            wirePortTypeField = fields.get(fields.size() - 1);
             technologyVersionField = fields.get(fields.size() - 2);
-            wirePortTypeField = fields.get(fields.size() - 3);
+            securityProtocolField = fields.get(fields.size() - 3);
         } else
             return;
-        setSecurityProtocol((String) securityProtocolField.getValue());
         if (technologyVersion == null) {
             technologyVersion = (String) technologyVersionField.getValue();
+            setSecurityProtocol((String) securityProtocolField.getValue());
+            wirePortType = (ConnectorType) wirePortTypeField.getValue();
+            super.fillAllFields(fields.subList(0, fields.size() - 3));
         }
-        wirePortType = (ConnectorType) wirePortTypeField.getValue();
-
-        super.fillAllFields(fields.subList(0, fields.size() - 3));
     }
 
     @Override
     public List<Field> getAllFieldsList() {
         List<Field> fields = super.getAllFieldsList();
-        fields.add(new Field(ConnectorType.class, getWirePortType()));
-        fields.add(new Field(String.class, getTechnologyVersion()));
         fields.add(new Field(String.class, getSecurityProtocol()));
+        fields.add(new Field(String.class, getTechnologyVersion()));
+        fields.add(new Field(ConnectorType.class, getWirePortType()));
         return fields;
     }
 

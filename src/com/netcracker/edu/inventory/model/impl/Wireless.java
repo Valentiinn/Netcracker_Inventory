@@ -9,13 +9,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Wireless<A extends Device, B extends Device> extends AbstractConnection implements OneToManyConnection {
+public class Wireless<A extends Device, B extends Device>
+        extends AbstractConnection implements OneToManyConnection {
 
-    private A aDevice;
-    private Device[] bDevice;
-    private String protocol;
-    private String technology;
     private int version;
+    private String technology;
+    private String protocol;
+    private A deviceA;
+    private Device[] devicesArray;
 
     public Wireless() {
         this(0, null);
@@ -23,27 +24,27 @@ public class Wireless<A extends Device, B extends Device> extends AbstractConnec
 
     public Wireless(int size, String technology) {
         this.technology = technology;
-        bDevice = new Device[size];
+        devicesArray = new Device[size];
     }
 
     @Override
     public void fillAllFields(List<Field> fields) {
-        Field aPointField = fields.get(fields.size() - 1);
-        aDevice = (A) aPointField.getValue();
-
-        Field bPointsField = fields.get(fields.size() - 2);
-        bDevice = (B[]) bPointsField.getValue();
+        Field versionField = fields.get(fields.size() - 5);
+        version = (Integer) versionField.getValue();
 
         if (technology == null) {
-            Field technologyField = fields.get(fields.size() - 3);
+            Field technologyField = fields.get(fields.size() - 4);
             technology = (String) technologyField.getValue();
         }
 
-        Field protocolField = fields.get(fields.size() - 4);
+        Field protocolField = fields.get(fields.size() - 3);
         protocol = (String) protocolField.getValue();
 
-        Field versionField = fields.get(fields.size() - 5);
-        version = (Integer) versionField.getValue();
+        Field aPointField = fields.get(fields.size() - 2);
+        deviceA = (A) aPointField.getValue();
+
+        Field bPointsField = fields.get(fields.size() - 1);
+        devicesArray = (B[]) bPointsField.getValue();
 
         super.fillAllFields(fields.subList(0, fields.size() - 5));
     }
@@ -52,11 +53,11 @@ public class Wireless<A extends Device, B extends Device> extends AbstractConnec
     public List<Field> getAllFieldsList() {
         List<Field> fields = super.getAllFieldsList();
 
-        fields.add(new Field(Integer.class, version));
-        fields.add(new Field(String.class, protocol));
+        fields.add(new Field(int.class, version));
         fields.add(new Field(String.class, technology));
-        fields.add(new Field(Array.class, bDevice));
-        fields.add(new Field(Device.class, aDevice));
+        fields.add(new Field(String.class, protocol));
+        fields.add(new Field(Device.class, deviceA));
+        fields.add(new Field(Array.class, devicesArray));
 
         return fields;
     }
@@ -73,37 +74,37 @@ public class Wireless<A extends Device, B extends Device> extends AbstractConnec
 
     @Override
     public A getAPoint() {
-        return aDevice;
+        return deviceA;
     }
 
     @Override
     public void setAPoint(Device device) {
-        aDevice = (A) device;
+        deviceA = (A) device;
     }
 
     @Override
     public List<B> getBPoints() {
-        return new ArrayList<B>(Arrays.asList((B[]) bDevice));
+        return new ArrayList<B>(Arrays.asList((B[]) devicesArray));
     }
 
     @Override
     public void setBPoints(List devices) {
-        bDevice = ((List<B>) devices).toArray(new Device[devices.size()]);
+        devicesArray = ((List<B>) devices).toArray(new Device[devices.size()]);
     }
 
     @Override
     public int getBCapacity() {
-        return bDevice.length;
+        return devicesArray.length;
     }
 
     @Override
     public B getBPoint(int deviceNumber) {
-        return (B) bDevice[deviceNumber];
+        return (B) devicesArray[deviceNumber];
     }
 
     @Override
     public void setBPoint(Device device, int deviceNumber) {
-        bDevice[deviceNumber] = device;
+        devicesArray[deviceNumber] = device;
     }
 
     public String getProtocol() {

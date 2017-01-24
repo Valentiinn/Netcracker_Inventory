@@ -17,6 +17,7 @@ abstract class AbstractDevice implements Device, Serializable {
     protected String manufacturer;
     protected String model;
     protected Date productionDate;
+    protected List<Field> fields;
 
     static protected Logger LOGGER = Logger.getLogger(AbstractDevice.class.getName());
 
@@ -86,22 +87,30 @@ abstract class AbstractDevice implements Device, Serializable {
 
     @Override
     public void fillAllFields(List<Field> fields) {
-        if ((Integer) fields.get(0).getValue() > 0) {
-            setIn((Integer) fields.get(0).getValue());
+        if (fields == null) {
+            return;
         }
-        setManufacturer((String) fields.get(2).getValue());
-        setModel((String) fields.get(3).getValue());
-        setProductionDate((Date) fields.get(4).getValue());
+        if (fields.get(0).getType().equals(int.class) && ((Integer) fields.get(0).getValue()) > 1) {
+            in = (Integer) fields.get(0).getValue();
+        }
+        if (fields.get(1) != null && fields.get(1).getType().equals(String.class)) {
+            model = (String) fields.get(1).getValue();
+        }
+        if (fields.get(2) != null && fields.get(2).getType().equals(String.class)) {
+            manufacturer = (String) fields.get(2).getValue();
+        }
+        if (fields.get(3) != null && fields.get(3).getType().equals(Date.class)) {
+            productionDate = (Date) fields.get(3).getValue();
+        }
     }
 
     @Override
     public List<Field> getAllFieldsList() {
-        List<Field> fields = new ArrayList<Field>();
-        fields.add(new Field(Integer.class, getIn()));
-        fields.add(new Field(String.class, getType()));
-        fields.add(new Field(String.class, getManufacturer()));
-        fields.add(new Field(String.class, getModel()));
-        fields.add(new Field(Date.class, getProductionDate()));
+        fields = new ArrayList<Field>();
+        fields.add(new Field(int.class, in));
+        fields.add(new Field(String.class, model));
+        fields.add(new Field(String.class, manufacturer));
+        fields.add(new Field(Date.class, productionDate));
         return fields;
     }
 }

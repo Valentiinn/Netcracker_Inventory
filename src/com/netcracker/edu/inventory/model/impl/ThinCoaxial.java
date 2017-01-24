@@ -36,7 +36,7 @@ public class ThinCoaxial <A extends Device> extends AbstractConnection implement
     @Override
     public List<Field> getAllFieldsList() {
         List<Field> fields = super.getAllFieldsList();
-        fields.add(new Field(Integer.class, maxSize));
+        fields.add(new Field(int.class, maxSize));
         fields.add(new Field(Set.class, devices));
         return fields;
     }
@@ -48,10 +48,7 @@ public class ThinCoaxial <A extends Device> extends AbstractConnection implement
 
     @Override
     public boolean addDevice(Device device) {
-        if(devices.size() < maxSize) {
-            return devices.add((A)device);
-        }
-        return false;
+        return devices.size() < maxSize && devices.add((A) device);
     }
 
     @Override

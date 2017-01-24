@@ -2,12 +2,11 @@ package com.netcracker.edu.inventory.service.impl;
 
 import com.netcracker.edu.inventory.exception.DeviceValidationException;
 import com.netcracker.edu.inventory.model.*;
-import com.netcracker.edu.inventory.model.FeelableEntity.Field;
 import com.netcracker.edu.inventory.model.impl.*;
-import com.netcracker.edu.inventory.service.DeviceService;
 import com.netcracker.edu.location.Location;
 import com.netcracker.edu.location.Service;
 import com.netcracker.edu.location.impl.ServiceImpl;
+import com.sun.org.apache.xml.internal.serialize.LineSeparator;
 
 import java.io.*;
 import java.lang.reflect.Array;
@@ -21,120 +20,174 @@ class InputOutputOperations {
     private Service service = new ServiceImpl();
     private Validator validator = new Validator();
     private ParserUtils parserUtils = new ParserUtils();
+    private List<FeelableEntity.Field> fieldList;
 
-    public void writeDevice(Device device, Writer writer) throws IOException {
-        if (device != null) {
-            if (!validator.isValidDeviceForWriteToStream(device)) {
-                DeviceValidationException e = new DeviceValidationException("DeviceService.writeDevice", device);
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-                throw e;
+    private void outputDeviceConnection(Device device, Connection connection, OutputStream outputStream) throws IOException {
+        if (device == null && connection == null) {
+            return;
+        }
+        validator.validate(outputStream);
+        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+        if (connection != null) {
+            dataOutputStream.writeUTF(connection.getClass().getName());
+            fieldList = connection.getAllFieldsList();
+        } else {
+            dataOutputStream.writeUTF(device.getClass().getName());
+            fieldList = device.getAllFieldsList();
+        }
+        writeOutputStream(dataOutputStream);
+    }
+
+    private void writeWriter(Writer writer) throws IOException {
+        for (FeelableEntity.Field field : fieldList) {
+            if (field.getValue() == null) {
+                writer.write(field.getType() == Date.class ? " -1 |" : " |");
             } else {
-                validator.validate(writer);
-            }
-            List<Field> fields = device.getAllFieldsList();
-            writer.write(device.getClass().getName());
-            for (int i = 0; i < fields.size(); i++) {
-                if (i == 0) {
-                    writer.write("\n" + "[" + fields.get(i).getValue() + "] ");
-                } else {
-                    if (fields.get(i).getType() == List.class || fields.get(i).getType() == Set.class || fields.get(i).getType() == Connection.class) {
-                        writeObjDevice(fields.get(i), writer);
-                    } else {
-                        writeField(fields.get(i), writer);
+                if (fieldList.indexOf(field) != 0) {
+                    writer.write(" ");
+                }
+                Class type = field.getType();
+                if (fieldList.indexOf(field) == 0 && type == int.class) {
+                    writer.write("[" + field.getValue() + "]");
+                    continue;
+                }
+                if (field.getType() == Device.class) {
+                    writer.write("");
+                }
+                if (field.getType() == Date.class) {
+                    writer.write(((Date) field.getValue()).getTime() + "");
+                } else if (field.getType() == ConnectorType.class) {
+                    writer.write(((ConnectorType) field.getValue()).name());
+                } else if (field.getType() == Array.class) {
+                    Device[] devicesArray = (Device[]) field.getValue();
+                    writer.write(devicesArray.length + " |");
+                    for (Device device : devicesArray) {
+                        writer.write(" |");
                     }
+                } else if (field.getType() == Set.class) {
+                    Set<Device> deviceSet = (Set<Device>) field.getValue();
+                    writer.write(deviceSet.size() + " |");
+                    for (Device device : deviceSet) {
+                        writer.write(" |");
+                    }
+                } else if (field.getType() == List.class) {
+                    List<Connection> connectionList = (List<Connection>) field.getValue();
+                    writer.write(connectionList.size() + " |");
+                    for (Connection connection : connectionList) {
+                        writer.write(" |");
+                    }
+                } else {
+                    writer.write(field.getValue().toString());
+                }
+                writer.write(" |");
+            }
+        }
+        writer.write(LineSeparator.Windows);
+    }
+
+    private void writeOutputStream(DataOutputStream dataOutputStream) throws IOException {
+        for (FeelableEntity.Field field : fieldList) {
+            if (field.getValue() == null && field.getType() != Date.class) {
+                dataOutputStream.writeUTF("\n");
+            } else {
+                Class type = field.getType();
+                if (type == int.class) {
+                    dataOutputStream.writeInt((Integer) field.getValue());
+                } else if (field.getType() == Device.class) {
+                    dataOutputStream.writeUTF("\n");
+                } else if (field.getType() == Date.class) {
+                    dataOutputStream.writeLong(field.getValue() == null ? -1 :
+                            ((Date) field.getValue()).getTime());
+                } else if (field.getType() == ConnectorType.class) {
+                    dataOutputStream.writeUTF(((ConnectorType) field.getValue()).name());
+                } else if (field.getType() == TwistedPair.Type.class) {
+                    dataOutputStream.writeUTF(((TwistedPair.Type) field.getValue()).getFullName());
+                } else if (field.getType() == OpticFiber.Mode.class) {
+                    dataOutputStream.writeUTF(((OpticFiber.Mode) field.getValue()).getFullName());
+                } else if (field.getType() == Array.class) {
+                    Device[] devicesArray = (Device[]) field.getValue();
+                    dataOutputStream.writeInt(devicesArray.length);
+                    for (Device device : devicesArray) {
+                        dataOutputStream.writeUTF("\n");
+                    }
+                } else if (field.getType() == Set.class) {
+                    Set<Device> deviceSet = (Set<Device>) field.getValue();
+                    dataOutputStream.writeInt(deviceSet.size());
+                    for (Device device : deviceSet) {
+                        dataOutputStream.writeUTF("\n");
+                    }
+                } else if (field.getType() == List.class) {
+                    List<Connection> connectionList = (List<Connection>) field.getValue();
+                    dataOutputStream.writeInt(connectionList.size());
+                    for (Connection connection : connectionList) {
+                        dataOutputStream.writeUTF("\n");
+                    }
+                } else {
+                    dataOutputStream.writeUTF(field.getValue().toString());
                 }
             }
-            writer.write("\n");
         }
     }
 
-    public void writeConnection(Connection connection, Writer writer) throws IOException {
-        if (connection != null) {
-            if (!validator.isValidConnectionForWriteToStream(connection)) {
-                IllegalArgumentException e = new IllegalArgumentException("Connection is not valid for write to stream");
-                LOGGER.log(Level.SEVERE, e.getMessage());
-                throw e;
-            } else {
-                validator.validate(writer);
-            }
-            List<Field> fields = connection.getAllFieldsList();
-            writer.write(connection.getClass().getName() + "\n");
-
-            writer.write(fields.get(0).getValue() + " |");
-            for (int i = 1; i < fields.size(); i++) {
-                writer.write(parserUtils.getPresentationOfPropertyForWriter(fields.get(i)) + "|");
-            }
-            writer.write("\n");
-        }
-    }
-
-    public Connection inputConnection(InputStream inputStream) throws IOException, ClassNotFoundException {
-        String className = className(inputStream);
-        Class clazz = clazz(className);
-        return getConnection(clazz, dataInputStream(inputStream));
-    }
-
-    public Connection readConnection(Reader reader) throws IOException, ClassNotFoundException {
-        validator.validate(reader);
-
-        Class clazz;
-        String className = readPropertyLine(reader);
-        clazz = Class.forName(className);
-        String propertyLine = readPropertyLine(reader);
-
-        if (clazz.getName().equals(TwistedPair.class.getName())) {
-            TwistedPair twistedPair = new TwistedPair();
-            twistedPair.fillAllFields(parseFields(propertyLine, twistedPair));
-            return twistedPair;
-        }
-
-        if (clazz.getName().equals(OpticFiber.class.getName())) {
+    private Connection getConnection(Class clazz, StringTokenizer stringTokenizer, DataInputStream dataInputStream) throws ClassNotFoundException, IOException {
+        if (clazz == OpticFiber.class) {
             OpticFiber opticFiber = new OpticFiber();
-            opticFiber.fillAllFields(parseFields(propertyLine, opticFiber));
+            fieldList = opticFiber.getAllFieldsList();
+            parserUtils.choiceOfMethod(stringTokenizer, dataInputStream, fieldList);
+            opticFiber.fillAllFields(fieldList);
             return opticFiber;
         }
-
-        if (clazz.getName().equals(Wireless.class.getName())) {
-            Wireless wireless = new Wireless();
-            wireless.fillAllFields(parseFields(propertyLine, wireless));
-            return wireless;
-        }
-
-        if (clazz.getName().equals(ThinCoaxial.class.getName())) {
+        if (clazz == ThinCoaxial.class) {
             ThinCoaxial thinCoaxial = new ThinCoaxial();
-            thinCoaxial.fillAllFields(parseFields(propertyLine, thinCoaxial));
+            fieldList = thinCoaxial.getAllFieldsList();
+            parserUtils.choiceOfMethod(stringTokenizer, dataInputStream, fieldList);
+            thinCoaxial.fillAllFields(fieldList);
             return thinCoaxial;
+        }
+        if (clazz == TwistedPair.class) {
+            TwistedPair twistedPair = new TwistedPair();
+            fieldList = twistedPair.getAllFieldsList();
+            parserUtils.choiceOfMethod(stringTokenizer, dataInputStream, fieldList);
+            twistedPair.fillAllFields(fieldList);
+            return twistedPair;
+        }
+        if (clazz == Wireless.class) {
+            Wireless wireless = new Wireless();
+            fieldList = wireless.getAllFieldsList();
+            parserUtils.choiceOfMethod(stringTokenizer, dataInputStream, fieldList);
+            wireless.fillAllFields(fieldList);
+            return wireless;
         }
         return null;
     }
 
-    public Device readDevice(Reader reader) throws IOException, ClassNotFoundException {
-        validator.validate(reader);
-        Class clazz;
-        String className = readPropertyLine(reader);
-        if (className.length() == 0) {
-            return null;
-        }
-        clazz = Class.forName(className);
-        String propertyLine = readPropertyLine(reader);
-        if (clazz.getName().equals(Battery.class.getName())) {
+    private Device getDevice(Class clazz, StringTokenizer stringTokenizer, DataInputStream dataInputStream) throws ClassNotFoundException, IOException {
+        if (clazz == Battery.class) {
             Battery battery = new Battery();
-            battery.fillAllFields(parseFields(propertyLine, battery));
+            fieldList = battery.getAllFieldsList();
+            parserUtils.choiceOfMethod(stringTokenizer, dataInputStream, fieldList);
+            battery.fillAllFields(fieldList);
             return battery;
         }
-        if (clazz.getName().equals(Router.class.getName())) {
+        if (clazz == Router.class) {
             Router router = new Router();
-            router.fillAllFields(parseFields(propertyLine, router));
+            fieldList = router.getAllFieldsList();
+            parserUtils.choiceOfMethod(stringTokenizer, dataInputStream, fieldList);
+            router.fillAllFields(fieldList);
             return router;
         }
-        if (clazz.getName().equals(Switch.class.getName())) {
-            Switch aSwitch = new Switch();
-            aSwitch.fillAllFields(parseFields(propertyLine, aSwitch));
-            return aSwitch;
+        if (clazz == Switch.class) {
+            Switch switcher = new Switch();
+            fieldList = switcher.getAllFieldsList();
+            parserUtils.choiceOfMethod(stringTokenizer, dataInputStream, fieldList);
+            switcher.fillAllFields(fieldList);
+            return switcher;
         }
-        if (clazz.getName().equals(WifiRouter.class.getName())) {
+        if (clazz == WifiRouter.class) {
             WifiRouter wifiRouter = new WifiRouter();
-            wifiRouter.fillAllFields(parseFields(propertyLine, wifiRouter));
+            fieldList = wifiRouter.getAllFieldsList();
+            parserUtils.choiceOfMethod(stringTokenizer, dataInputStream, fieldList);
+            wifiRouter.fillAllFields(fieldList);
             return wifiRouter;
         }
         return null;
@@ -156,7 +209,6 @@ class InputOutputOperations {
         return rack;
     }
 
-
     public void serializeDevice(Device device, OutputStream outputStream) throws IOException {
         if (device == null) {
             return;
@@ -177,44 +229,37 @@ class InputOutputOperations {
         return device;
     }
 
-
     public void writeRack(Rack rack, Writer writer) throws IOException {
-        if (rack != null) {
-            validator.validate(writer);
-            service.writeLocation(rack.getLocation(), writer);
-            writer.write(rack.getSize() + " " + rack.getTypeOfDevices().getName() + "\n");
-            DeviceService deviceService = new DeviceServiceImpl();
-            for (int i = 0; i < rack.getSize(); i++) {
-                if (rack.getDevAtSlot(i) == null) {
-                    if (i != rack.getSize() - 1) writer.write("\n");
-                } else {
-                    deviceService.writeDevice(rack.getDevAtSlot(i), writer);
-                }
+        if (rack == null) {
+            return;
+        }
+        validator.validate(writer);
+        com.netcracker.edu.location.impl.ServiceImpl locationService = new com.netcracker.edu.location.impl.ServiceImpl();
+        locationService.writeLocation(rack.getLocation(), writer);
+        writer.write(rack.getSize() + " ");
+        writer.write(rack.getTypeOfDevices().getCanonicalName() + LineSeparator.Windows);
+        for (int i = 0; i < rack.getSize(); i++) {
+            Device device = rack.getDevAtSlot(i);
+            if (device != null) {
+                writeDevice(device, writer);
+            } else {
+                writer.write(LineSeparator.Windows);
             }
         }
     }
 
     public Rack readRack(Reader reader) throws IOException, ClassNotFoundException {
+        Rack rack;
         validator.validate(reader);
-        Location location = service.readLocation(reader);
-        String rackSize = "";
-        String rackType = "";
-        int data = reader.read();
-        while (data != ' ') {
-            rackSize += (char) data;
-            data = reader.read();
-        }
-        while (data != '\n') {
-            rackType += (char) data;
-            data = reader.read();
-        }
-        int size = Integer.parseInt(rackSize);
-        rackType = rackType.trim();
-        DeviceService deviceService = new DeviceServiceImpl();
-        RackArrayImpl rack = new RackArrayImpl(size, Class.forName(rackType));
+        com.netcracker.edu.location.impl.ServiceImpl locationService = new com.netcracker.edu.location.impl.ServiceImpl();
+        Location location = locationService.readLocation(reader);
+        StringTokenizer stringTokenizer = new StringTokenizer(parserUtils.lineRead(reader), " ");
+        int in = Integer.parseInt(stringTokenizer.nextToken());
+        Class clazz = Class.forName(stringTokenizer.nextToken());
+        rack = new RackArrayImpl(in, clazz);
         rack.setLocation(location);
-        for (int i = 0; i < size; i++) {
-            Device device = deviceService.readDevice(reader);
+        for (int i = 0; i < rack.getSize(); i++) {
+            Device device = readDevice(reader);
             if (device != null) {
                 rack.insertDevToSlot(device, i);
             }
@@ -260,389 +305,81 @@ class InputOutputOperations {
         }
     }
 
-    public void outputDevice(Device device, OutputStream outputStream) throws IOException {
-        if (device != null) {
-            validator.validate(outputStream);
-
-            List<Field> fields = device.getAllFieldsList();
-            DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
-
-            dataOutputStream.writeUTF(device.getClass().getName());
-
-            for (Field field : fields) {
-                if (field.getType() == Integer.class) {
-                    dataOutputStream.writeInt(parserUtils.getPresentationOfProperty((Integer) field.getValue()));
-                }
-                if (field.getType() == String.class) {
-                    dataOutputStream.writeUTF(parserUtils.getPresentationOfProperty((String) field.getValue()));
-                }
-                if (field.getType() == Date.class) {
-                    dataOutputStream.writeLong(parserUtils.getPresentationOfProperty((Date) field.getValue()));
-                }
-                if (field.getType() == ConnectorType.class) {
-                    dataOutputStream.writeUTF(parserUtils.getPresentationOfProperty(((ConnectorType) field.getValue()).name()));
-                }
-                if (field.getType() == Connection.class) {
-                    dataOutputStream.writeUTF(parserUtils.getPresentationOfProperty((Connection) field.getValue()));
-                }
-                if (field.getType() == Array.class) {
-                    dataOutputStream.writeInt(parserUtils.getPresentationOfProperty((Connection[]) field.getValue()));
-                }
-            }
+    public void writeConnection(Connection connection, Writer writer) throws IOException {
+        if (connection == null) {
+            return;
         }
+        validator.validate(writer);
+        if (!validator.isValidConnectionForWriteToStream(connection)) {
+            IllegalArgumentException e = new IllegalArgumentException("Connection is not valid for write to stream");
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
+        }
+        fieldList = connection.getAllFieldsList();
+        writer.write(connection.getClass().getName() + LineSeparator.Windows);
+        writeWriter(writer);
     }
 
-    public Device inputDevice(InputStream inputStream) throws IOException, ClassNotFoundException {
-        String className = className(inputStream);
-        Class clazz = clazz(className);
-        return getDevice(clazz, dataInputStream(inputStream));
+    public Connection readConnection(Reader reader) throws IOException, ClassNotFoundException {
+        validator.validate(reader);
+        String className = parserUtils.lineRead(reader);
+        Class clazz;
+        if (className.equals("")) {
+            return null;
+        } else {
+            clazz = Class.forName(className);
+        }
+        StringTokenizer stringTokenizer = new StringTokenizer(parserUtils.lineRead(reader), "|");
+        return getConnection(clazz, stringTokenizer, null);
     }
 
     public void outputConnection(Connection connection, OutputStream outputStream) throws IOException {
-        if (connection != null) {
-
-            validator.validate(outputStream);
-            DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
-
-            dataOutputStream.writeUTF(connection.getClass().getName());
-
-            List<Field> fields = connection.getAllFieldsList();
-
-            for (Field field : fields) {
-                if (field.getType() == Integer.class) {
-                    dataOutputStream.writeInt(parserUtils.getPresentationOfProperty((Integer) field.getValue()));
-                }
-                if (field.getType() == String.class) {
-                    dataOutputStream.writeUTF(parserUtils.getPresentationOfProperty((String) field.getValue()));
-                }
-                if (field.getType() == Date.class) {
-                    dataOutputStream.writeLong(parserUtils.getPresentationOfProperty((Date) field.getValue()));
-                }
-                if (field.getType() == TwistedPair.Type.class) {
-                    dataOutputStream.writeUTF(parserUtils.getPresentationOfProperty(((TwistedPair.Type) field.getValue()).name()));
-                }
-                if (field.getType() == OpticFiber.Mode.class) {
-                    dataOutputStream.writeUTF(parserUtils.getPresentationOfProperty(((OpticFiber.Mode) field.getValue()).name()));
-                }
-                if (field.getType() == Device.class) {
-                    dataOutputStream.writeUTF("[ ]");
-                }
-                if (field.getType() == List.class) {
-                    List<Device> devices = (List<Device>) field.getValue();
-                    dataOutputStream.writeInt(devices.size());
-                    for (Device device : devices) {
-                        dataOutputStream.writeUTF("[ ]");
-                    }
-                }
-                if (field.getType() == Set.class) {
-                    Set<Device> devices = (Set<Device>) field.getValue();
-                    dataOutputStream.writeInt(devices.size());
-                    for (Device device : devices) {
-                        dataOutputStream.writeUTF("[ ]");
-                    }
-                }
-            }
-        }
+        outputDeviceConnection(null, connection, outputStream);
     }
 
-    private Device getDevice(Class clazz, DataInputStream dataInputStream) throws IOException {
-        if (clazz == Battery.class) {
-            Battery battery = new Battery();
-            battery.fillAllFields(getFieldsFromDataInputStream(dataInputStream, battery));
-            return battery;
-        }
-        if (clazz == Router.class) {
-            Router router = new Router();
-            router.fillAllFields(getFieldsFromDataInputStream(dataInputStream, router));
-            return router;
-        }
-        if (clazz == Switch.class) {
-            Switch aSwitch = new Switch();
-            aSwitch.fillAllFields(getFieldsFromDataInputStream(dataInputStream, aSwitch));
-            return aSwitch;
-        }
-        if (clazz == WifiRouter.class) {
-            WifiRouter wifiRouter = new WifiRouter();
-            wifiRouter.fillAllFields(getFieldsFromDataInputStream(dataInputStream, wifiRouter));
-            return wifiRouter;
-        }
-        return null;
-    }
-
-    private Connection getConnection(Class clazz, DataInputStream dataInputStream) throws IOException, ClassNotFoundException {
-        if (clazz == OpticFiber.class) {
-            OpticFiber opticFiber = new OpticFiber();
-            opticFiber.fillAllFields(getFieldsFromDataInputStream(dataInputStream, opticFiber));
-            return opticFiber;
-        }
-        if (clazz == TwistedPair.class) {
-            TwistedPair twistedPair = new TwistedPair();
-            twistedPair.fillAllFields(getFieldsFromDataInputStream(dataInputStream, twistedPair));
-            return twistedPair;
-        }
-        if (clazz == Wireless.class) {
-            Wireless wireless = new Wireless();
-            wireless.fillAllFields(getFieldsFromDataInputStream(dataInputStream, wireless));
-            return wireless;
-        }
-        if (clazz == ThinCoaxial.class) {
-            ThinCoaxial thinCoaxial = new ThinCoaxial();
-            thinCoaxial.fillAllFields(getFieldsFromDataInputStream(dataInputStream, thinCoaxial));
-            return thinCoaxial;
-        }
-        return null;
-    }
-
-
-    private DataInputStream dataInputStream(InputStream inputStream) {
-        DataInputStream dataInputStream = new DataInputStream(inputStream);
-        return dataInputStream;
-    }
-
-    private String className(InputStream inputStream) throws IOException {
+    public Connection inputConnection(InputStream inputStream) throws IOException, ClassNotFoundException {
         validator.validate(inputStream);
         DataInputStream dataInputStream = new DataInputStream(inputStream);
-        String className = dataInputStream.readUTF();
-        return className;
+        Class clazz = Class.forName(dataInputStream.readUTF());
+        return getConnection(clazz, null, dataInputStream);
     }
 
-    private Class clazz(String className) throws ClassNotFoundException {
-        Class clazz = Class.forName(className);
-        return clazz;
-    }
-
-    private List<FeelableEntity.Field> getFieldsFromDataInputStream(DataInputStream dataInputStream, Device device) throws IOException {
-        List<FeelableEntity.Field> fields = device.getAllFieldsList();
-        for (FeelableEntity.Field field : fields) {
-            if (field.getType() == Integer.class) {
-                field.setValue(getIntFromDataInputStream(dataInputStream));
-            }
-
-            if (field.getType() == String.class) {
-                field.setValue(getStringFromDataInputStream(dataInputStream));
-            }
-
-            if (field.getType() == Date.class) {
-                field.setValue(getDateFromDataInputStream(dataInputStream));
-            }
-
-            if (field.getType() == ConnectorType.class) {
-                field.setValue(ConnectorType.valueOf(getStringFromDataInputStream(dataInputStream)));
-            }
-
-            if (field.getType() == Connection.class) {
-                dataInputStream.readUTF();
-                field.setValue(null);
-            }
-
-            if (field.getType() == Array.class) {
-                field.setValue(new Connection[dataInputStream.readInt()]);
-            }
+    public void writeDevice(Device device, Writer writer) throws IOException {
+        if (device == null) {
+            return;
         }
-        return fields;
-    }
-
-    private List<Field> getFieldsFromDataInputStream(DataInputStream dataInputStream, Connection connection) throws IOException, ClassNotFoundException {
-        List<Field> fields = connection.getAllFieldsList();
-        for (Field field : fields) {
-            if (field.getType() == Integer.class) {
-                field.setValue(getIntFromDataInputStream(dataInputStream));
-            }
-
-            if (field.getType() == String.class) {
-                field.setValue(getStringFromDataInputStream(dataInputStream));
-            }
-
-            if (field.getType() == TwistedPair.Type.class) {
-                field.setValue(TwistedPair.Type.valueOf(getStringFromDataInputStream(dataInputStream)));
-            }
-
-            if (field.getType() == OpticFiber.Mode.class) {
-                field.setValue(OpticFiber.Mode.valueOf(getStringFromDataInputStream(dataInputStream)));
-            }
-
-            if (field.getType() == Device.class) {
-                dataInputStream.readUTF();
-            }
-
-            if (field.getType() == List.class) {
-                int size = dataInputStream.readInt();
-                List<Device> devices = new ArrayList<Device>(size);
-                for (int i = 0; i < size - 1; i++) {
-                    dataInputStream.readUTF();
-                }
-                field.setValue(devices);
-            }
-
-            if (field.getType() == Set.class) {
-                int size = dataInputStream.readInt();
-                Set<Device> devices = new HashSet<Device>(size);
-                for (int i = 0; i < size; i++) {
-                    dataInputStream.readUTF();
-                }
-                field.setValue(devices);
-            }
+        validator.validate(writer);
+        if (!validator.isValidDeviceForWriteToStream(device)) {
+            DeviceValidationException e = new DeviceValidationException("DeviceService.writeDevice", device);
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
         }
-        return fields;
+        fieldList = device.getAllFieldsList();
+        writer.write(device.getClass().getName() + LineSeparator.Windows);
+        writeWriter(writer);
     }
 
-    private int getIntFromDataInputStream(DataInputStream dataInputStream) throws IOException {
-        return dataInputStream.readInt();
-    }
-
-    private String getStringFromDataInputStream(DataInputStream dataInputStream) throws IOException {
-        String stringValue = dataInputStream.readUTF();
-        if (stringValue.equals("[ ]")) {
+    public Device readDevice(Reader reader) throws IOException, ClassNotFoundException {
+        validator.validate(reader);
+        String className = parserUtils.lineRead(reader);
+        Class clazz;
+        if (className.equals("")) {
             return null;
+        } else {
+            clazz = Class.forName(className);
         }
-        return stringValue;
+        StringTokenizer stringTokenizer = new StringTokenizer(parserUtils.lineRead(reader), "[]|");
+        return getDevice(clazz, stringTokenizer, null);
     }
 
-
-    private Date getDateFromDataInputStream(DataInputStream dataInputStream) throws IOException {
-        long time = dataInputStream.readLong();
-        if (time != -1) {
-            return new Date(time);
-        }
-        return null;
+    public void outputDevice(Device device, OutputStream outputStream) throws IOException {
+        outputDeviceConnection(device, null, outputStream);
     }
 
-
-    private String readPropertyLine(Reader reader) throws IOException {
-        StringBuilder propertyLine = new StringBuilder();
-        for (char c = 0; c != '\n'; c = (char) reader.read()) {
-            propertyLine.append(c);
-        }
-        return propertyLine.toString().trim();
-    }
-
-    private List<Field> parseFields(String propertyLine, Connection connection) {
-        List<Field> fields = connection.getAllFieldsList();
-
-        String[] properties = new String[fields.size()];
-
-        for (int i = 0; i < fields.size(); i++) {
-            properties[i] = propertyLine.split("\\|")[i];
-        }
-
-        fields.get(0).setValue(properties[0].trim());
-
-        for (int i = 1; i < fields.size(); i++) {
-            Field field = fields.get(i);
-
-            if (field.getType() == Integer.class) {
-                field.setValue(parserUtils.parseInteger(properties[i]));
-            }
-
-            if (field.getType() == String.class) {
-                field.setValue(parserUtils.parseString(properties[i]));
-            }
-
-            if (field.getType() == Date.class) {
-                field.setValue(parserUtils.parseDate(properties[i]));
-            }
-
-            if (field.getType() == Device.class) {
-                field.setValue(parserUtils.parseDevice(properties[i]));
-            }
-
-            if (field.getType() == Set.class) {
-                field.setValue(parserUtils.parseSet(properties[i]));
-            }
-
-            if (field.getType() == List.class) {
-                field.setValue(parserUtils.parseList(properties[i]));
-            }
-
-            if (field.getType() == TwistedPair.Type.class) {
-                field.setValue(parserUtils.parseType(properties[i]));
-            }
-
-            if (field.getType() == OpticFiber.Mode.class) {
-                field.setValue(parserUtils.parseMode(properties[i]));
-            }
-
-            if (field.getType() == Array.class) {
-                field.setValue(parserUtils.parseArray(properties[i]));
-            }
-        }
-        return fields;
-    }
-
-    private List<Field> parseFields(String propertyLine, Device device) {
-        List<Field> fields = device.getAllFieldsList();
-
-        String[] properties = new String[fields.size()];
-
-        properties[0] = propertyLine.split(" ")[0];
-        properties[1] = propertyLine.split("\\|")[0].split(" ")[1];
-
-        for (int i = 2; i < fields.size(); i++) {
-            properties[i] = propertyLine.split("\\|")[i - 1];
-        }
-
-        for (int i = 0; i < fields.size(); i++) {
-            Field field = fields.get(i);
-
-            if (field.getType() == Integer.class) {
-                field.setValue(parserUtils.parseInteger(properties[i]));
-            }
-
-            if (field.getType() == String.class) {
-                field.setValue(parserUtils.parseString(properties[i]));
-            }
-
-            if (field.getType() == Date.class) {
-                field.setValue(parserUtils.parseDate(properties[i]));
-            }
-
-            if (field.getType() == Array.class) {
-                field.setValue(parserUtils.parseArray(properties[i]));
-            }
-
-            if (field.getType() == ConnectorType.class) {
-                field.setValue(parserUtils.parseConnectorType(properties[i]));
-            }
-
-            if (field.getType() == Connection.class) {
-                field.setValue(null);
-            }
-        }
-        return fields;
-    }
-
-    private void writeObjDevice(Field field, Writer writer) throws IOException {
-        if (field.getType() == List.class) {
-            writer.write(((List<Connection>) field.getValue()).size() + " | ");
-            for (Connection connection : ((List<Connection>) field.getValue())) {
-                writeConnection(null, writer);
-            }
-        }
-        if (field.getType() == Connection.class) {
-            writer.write("| ");
-        }
-    }
-
-    private void writeField(Field field, Writer writer) throws IOException {
-        if (field != null) {
-            if (field.getType() == Date.class) {
-                writer.write(field.getValue() == null ? -1 + " | " : ((Date) field.getValue()).getTime() + " | ");
-            }
-            if (field.getType() == String.class) {
-                writer.write(field.getValue() == null ? "| " : field.getValue() + " | ");
-            }
-            if (field.getType() == Integer.class) {
-                writer.write(field.getValue() + " | ");
-            }
-            if (field.getType() == OpticFiber.Mode.class) {
-                writer.write((field.getValue()) + " | ");
-            }
-            if (field.getType() == TwistedPair.Type.class) {
-                writer.write((field.getValue()) + " | ");
-            }
-            if (field.getType() == ConnectorType.class) {
-                writer.write(field.getValue() == null ? "| " : field.getValue() + " | ");
-            }
-        }
+    public Device inputDevice(InputStream inputStream) throws IOException, ClassNotFoundException {
+        validator.validate(inputStream);
+        DataInputStream dataInputStream = new DataInputStream(inputStream);
+        Class clazz = Class.forName(dataInputStream.readUTF());
+        return getDevice(clazz, null, dataInputStream);
     }
 }

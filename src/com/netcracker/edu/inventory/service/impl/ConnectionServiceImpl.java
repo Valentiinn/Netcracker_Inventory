@@ -5,7 +5,7 @@ import com.netcracker.edu.inventory.service.ConnectionService;
 
 import java.io.*;
 
-public class ConnectionServiceImpl implements ConnectionService {
+class ConnectionServiceImpl implements ConnectionService {
     private Validator validator = new Validator();
     private InputOutputOperations inputOutputOperations = new InputOutputOperations();
 

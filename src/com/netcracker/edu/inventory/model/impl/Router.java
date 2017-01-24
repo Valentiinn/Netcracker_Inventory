@@ -20,15 +20,23 @@ public class Router extends AbstractDevice implements Device {
 
     @Override
     public void fillAllFields(List<Field> fields) {
-        Field dataRate = fields.get(fields.size() - 1);
-        setDataRate((Integer) dataRate.getValue());
-        super.fillAllFields(fields.subList(0, fields.size() - 1));
+        Field f;
+        if (fields != null) {
+            f = fields.get(fields.size() - 1);
+        } else {
+            return;
+        }
+        if (f != null && f.getType().equals(int.class)) {
+            dataRate = (Integer) f.getValue();
+        }
+        fields.remove(f);
+        super.fillAllFields(fields);
     }
 
     @Override
     public List<Field> getAllFieldsList() {
         List<Field> fields = super.getAllFieldsList();
-        fields.add(new Field(Integer.class, getDataRate()));
+        fields.add(new Field(int.class, dataRate));
         return fields;
     }
 }

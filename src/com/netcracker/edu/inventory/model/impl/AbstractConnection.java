@@ -17,15 +17,15 @@ public class AbstractConnection implements Connection {
     @Deprecated
     @Override
     public void feelAllFields(Field[] fields) {
-        ArrayList<Field> list = new ArrayList<Field>(Arrays.asList(fields));
-        fillAllFields(list);
+        ArrayList<Field> fieldList = new ArrayList<Field>(Arrays.asList(fields));
+        fillAllFields(fieldList);
     }
 
     @Deprecated
     @Override
     public Field[] getAllFields() {
-        List<Field> list = getAllFieldsList();
-        return list.toArray(new Field[list.size()]);
+        List<Field> fieldList = getAllFieldsList();
+        return fieldList.toArray(new Field[fieldList.size()]);
     }
 
     @Override

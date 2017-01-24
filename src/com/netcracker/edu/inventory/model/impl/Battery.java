@@ -20,15 +20,23 @@ public class Battery extends AbstractDevice implements Device {
 
     @Override
     public void fillAllFields(List<Field> fields) {
-        Field chargeVolumeField = fields.get(fields.size() - 1);
-        setChargeVolume((Integer) chargeVolumeField.getValue());
-        super.fillAllFields(fields.subList(0, fields.size() - 1));
+        Field f;
+        if (fields != null) {
+            f = fields.get(fields.size() - 1);
+        } else {
+            return;
+        }
+        if (f != null && f.getType().equals(int.class)) {
+            chargeVolume = (Integer) f.getValue();
+        }
+        fields.remove(f);
+        super.fillAllFields(fields);
     }
 
     @Override
     public List<Field> getAllFieldsList() {
         List<Field> fields = super.getAllFieldsList();
-        fields.add(new Field(Integer.class, getChargeVolume()));
+        fields.add(new Field(int.class, chargeVolume));
         return fields;
     }
 }

@@ -33,17 +33,15 @@ public class Switch extends Router implements Device {
 
     @Override
     public void fillAllFields(List<Field> fields) {
-        Field numberOfPortsField = fields.get(fields.size() - 1);
+        Field numberOfPortsField = fields.get(fields.size() - 3);
         Field portsTypeField = fields.get(fields.size() - 2);
-        Field portsConnectionsField = fields.get(fields.size() - 3);
-        List<Connection> connections = (List<Connection>) portsConnectionsField.getValue();
-
-        portsConnections = connections.toArray(new Connection[connections.size()]);
+        Field portsConnectionsField = fields.get(fields.size() - 1);
         setNumberOfPorts((Integer) numberOfPortsField.getValue());
         if (portsType == ConnectorType.need_init) {
             portsType = (ConnectorType) portsTypeField.getValue();
         }
-
+        List<Connection> connections = (List<Connection>) portsConnectionsField.getValue();
+        portsConnections = connections.toArray(new Connection[connections.size()]);
         super.fillAllFields(fields.subList(0, fields.size() - 3));
     }
 
@@ -51,9 +49,9 @@ public class Switch extends Router implements Device {
     public List<Field> getAllFieldsList() {
         List<Field> fields = super.getAllFieldsList();
 
-        fields.add(new Field(List.class, new ArrayList<Connection>(Arrays.asList(portsConnections))));
+        fields.add(new Field(int.class, getNumberOfPorts()));
         fields.add(new Field(ConnectorType.class, getPortsType()));
-        fields.add(new Field(Integer.class, getNumberOfPorts()));
+        fields.add(new Field(List.class, new ArrayList<Connection>(Arrays.asList(portsConnections))));
 
         return fields;
     }
