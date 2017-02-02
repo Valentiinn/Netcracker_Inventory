@@ -2,9 +2,7 @@ package com.netcracker.edu.inventory.model.impl;
 
 import com.netcracker.edu.inventory.AssertUtilities;
 import com.netcracker.edu.inventory.CreateUtilities;
-import com.netcracker.edu.inventory.model.ConnectorType;
-import com.netcracker.edu.inventory.model.Device;
-import com.netcracker.edu.inventory.service.impl.DeviceServiceImplTest;
+import com.netcracker.edu.inventory.model.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +16,7 @@ public class WifiRouterTest {
 
     WifiRouter defaultWifiRouter;
     WifiRouter wifiRouter;
+    WifiRouter wifiRouterWithConnections;
     String technologyVersion = "802.11g";
 
     String securityProtocol = "";
@@ -26,6 +25,7 @@ public class WifiRouterTest {
     public void before() throws Exception {
         defaultWifiRouter = new WifiRouter();
         wifiRouter = CreateUtilities.createWifiRouter();
+        wifiRouterWithConnections = CreateUtilities.createWifiRouterWithConnections();
     }
 
     @After
@@ -77,38 +77,55 @@ public class WifiRouterTest {
 
     @Test
     public void testGetAndFeelAllFieldsArray() throws Exception {
-        wifiRouter = CreateUtilities.createWifiRouter();
-
         Device result1 = new WifiRouter();
-        result1.feelAllFields(wifiRouter.getAllFields());
+        result1.feelAllFields(wifiRouterWithConnections.getAllFields());
 
-        AssertUtilities.assertDevice(wifiRouter, result1);
+        AssertUtilities.assertDevice(wifiRouterWithConnections, result1);
     }
 
     @Test
     public void testGetAndFeelAllFieldsArray_EmptyDevice() throws Exception {
         Device result1 = new WifiRouter();
-        result1.feelAllFields(wifiRouter.getAllFields());
+        result1.feelAllFields(wifiRouterWithConnections.getAllFields());
 
-        AssertUtilities.assertDevice(wifiRouter, result1);
+        AssertUtilities.assertDevice(wifiRouterWithConnections, result1);
     }
 
     @Test
     public void testGetAndFeelAllFields() throws Exception {
-        wifiRouter = CreateUtilities.createWifiRouter();
-
         WifiRouter result1 = new WifiRouter();
-        result1.fillAllFields(wifiRouter.getAllFieldsList());
+        result1.fillAllFields(wifiRouterWithConnections.getAllFieldsList());
 
-        AssertUtilities.assertWifiRouter(wifiRouter, result1);
+        AssertUtilities.assertWifiRouter(wifiRouterWithConnections, result1);
     }
 
     @Test
     public void testGetAndFeelAllFields_EmptyDevice() throws Exception {
         WifiRouter result1 = new WifiRouter();
-        result1.fillAllFields(wifiRouter.getAllFieldsList());
+        result1.fillAllFields(wifiRouterWithConnections.getAllFieldsList());
 
-        AssertUtilities.assertWifiRouter(wifiRouter, result1);
+        AssertUtilities.assertWifiRouter(wifiRouterWithConnections, result1);
+    }
+
+    @Test
+    public void isPrimaryKey() throws Exception {
+        assertFalse(defaultWifiRouter.isPrimaryKey());
+    }
+
+    @Test
+    public void getPrimaryKey() throws Exception {
+        DevicePrimaryKey expDevicePK = new DevicePK(wifiRouter.getIn());
+
+        Unique.PrimaryKey primaryKey = wifiRouter.getPrimaryKey();
+
+        AssertUtilities.assertSomePK(expDevicePK, primaryKey);
+    }
+
+    @Test
+    public void getPrimaryKey_PK_NULL() throws Exception {
+        Unique.PrimaryKey primaryKey = defaultWifiRouter.getPrimaryKey();
+
+        assertNull(primaryKey);
     }
 
 }

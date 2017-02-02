@@ -28,18 +28,24 @@ public class WifiRouter extends Router implements Device {
         Field securityProtocolField;
         Field technologyVersionField;
         Field wirePortTypeField;
+        Field wireConnectionField;
+        Field wirelessConnectionField;
         if (fields != null) {
-            wirePortTypeField = fields.get(fields.size() - 1);
-            technologyVersionField = fields.get(fields.size() - 2);
-            securityProtocolField = fields.get(fields.size() - 3);
+            securityProtocolField = fields.get(fields.size() - 5);
+            technologyVersionField = fields.get(fields.size() - 4);
+            wirePortTypeField = fields.get(fields.size() - 3);
+            wireConnectionField = fields.get(fields.size() - 2);
+            wirelessConnectionField = fields.get(fields.size() - 1);
         } else
             return;
+        setSecurityProtocol((String) securityProtocolField.getValue());
         if (technologyVersion == null) {
             technologyVersion = (String) technologyVersionField.getValue();
-            setSecurityProtocol((String) securityProtocolField.getValue());
-            wirePortType = (ConnectorType) wirePortTypeField.getValue();
-            super.fillAllFields(fields.subList(0, fields.size() - 3));
         }
+        wirePortType = (ConnectorType) wirePortTypeField.getValue();
+        wireConnection = (Connection) wireConnectionField.getValue();
+        wirelessConnection = (Connection) wirelessConnectionField.getValue();
+        super.fillAllFields(fields.subList(0, fields.size() - 3));
     }
 
     @Override
@@ -48,6 +54,8 @@ public class WifiRouter extends Router implements Device {
         fields.add(new Field(String.class, getSecurityProtocol()));
         fields.add(new Field(String.class, getTechnologyVersion()));
         fields.add(new Field(ConnectorType.class, getWirePortType()));
+        fields.add(new Field(Connection.class, getWireConnection()));
+        fields.add(new Field(Connection.class, getWirelessConnection()));
         return fields;
     }
 

@@ -1,15 +1,9 @@
 package com.netcracker.edu.inventory.service.impl;
 
 import com.netcracker.edu.inventory.model.Device;
-import com.netcracker.edu.inventory.model.impl.Battery;
-import com.netcracker.edu.inventory.model.impl.Router;
-import com.netcracker.edu.inventory.model.impl.Switch;
-import com.netcracker.edu.inventory.model.impl.WifiRouter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Test only methods are presents

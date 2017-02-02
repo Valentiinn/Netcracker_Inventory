@@ -48,6 +48,7 @@ public interface RackService {
      * @param rack - source Rack
      * @param outputStream - targeted binary stream
      */
+    @Deprecated
     void serializeRack(Rack rack, OutputStream outputStream) throws IOException;
 
     /**
@@ -56,6 +57,7 @@ public interface RackService {
      * @param inputStream - source binary stream
      * @return - received Rack instance
      */
+    @Deprecated
     Rack deserializeRack(InputStream inputStream) throws IOException, ClassCastException, ClassNotFoundException;
 
 }

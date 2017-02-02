@@ -50,11 +50,13 @@ class DeviceServiceImpl implements DeviceService {
         return inputOutputOperations.inputDevice(inputStream);
     }
 
+    @Deprecated
     @Override
     public void serializeDevice(Device device, OutputStream outputStream) throws IOException {
         inputOutputOperations.serializeDevice(device, outputStream);
     }
 
+    @Deprecated
     @Override
     public Device deserializeDevice(InputStream inputStream) throws IOException, ClassCastException, ClassNotFoundException {
         return inputOutputOperations.deserializeDevice(inputStream);

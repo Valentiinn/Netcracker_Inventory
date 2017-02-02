@@ -3,14 +3,14 @@ package com.netcracker.edu.inventory.model.impl;
 import com.netcracker.edu.inventory.AssertUtilities;
 import com.netcracker.edu.inventory.CreateUtilities;
 import com.netcracker.edu.inventory.model.Connection;
+import com.netcracker.edu.inventory.model.ConnectionPrimaryKey;
 import com.netcracker.edu.inventory.model.ConnectorType;
+import com.netcracker.edu.inventory.model.Unique;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -25,7 +25,7 @@ public class ThinCoaxialTest {
     String defaultStatus = Connection.PLANED;
     String status = Connection.USED;
     int defaultCurSize = 0;
-    int curSize = 2;
+    int curSize = 0;
     int defaultMaxSize = 0;
     int maxSize = 5;
 
@@ -139,8 +139,6 @@ public class ThinCoaxialTest {
     @Deprecated
     @Test
     public void testGetAndFeelAllFieldsArray() throws Exception {
-        thinCoaxial = CreateUtilities.createThinCoaxial();
-
         ThinCoaxial result1 = new ThinCoaxial();
         result1.feelAllFields(thinCoaxial.getAllFields());
 
@@ -158,8 +156,6 @@ public class ThinCoaxialTest {
 
     @Test
     public void testGetAndFeelAllFields() throws Exception {
-        thinCoaxial = CreateUtilities.createThinCoaxial();
-
         ThinCoaxial result1 = new ThinCoaxial();
         result1.fillAllFields(thinCoaxial.getAllFieldsList());
 
@@ -172,6 +168,47 @@ public class ThinCoaxialTest {
         result1.fillAllFields(thinCoaxial.getAllFieldsList());
 
         AssertUtilities.assertThinCoaxial(thinCoaxial, result1);
+    }
+
+    @Test
+    public void isPrimaryKey() throws Exception {
+        assertFalse(thinCoaxial.isPrimaryKey());
+    }
+
+    @Test
+    public void getPrimaryKey() throws Exception {
+        ConnectionPrimaryKey expConnectionPK = new ConnectionPK(thinCoaxial.getTrunk(), thinCoaxial.getSerialNumber());
+
+        Unique.PrimaryKey primaryKey = thinCoaxial.getPrimaryKey();
+
+        AssertUtilities.assertSomePK(expConnectionPK, primaryKey);
+    }
+
+    @Test
+    public void getPrimaryKey_PK_NULL() throws Exception {
+        Unique.PrimaryKey primaryKey = defaultThinCoaxial.getPrimaryKey();
+
+        assertNull(primaryKey);
+    }
+
+    @Test
+    public void compareTo() throws Exception {
+        Connection connection1 = new ThinCoaxial();
+        connection1.setSerialNumber(1);
+        Connection connection2 = new ThinCoaxial();
+        connection2.setSerialNumber(2);
+        Connection connection3 = new ThinCoaxial();
+        connection3.setSerialNumber(3);
+        Connection connection4 = new ThinCoaxial();
+        connection4.setSerialNumber(2);
+
+        int result1 = connection2.compareTo(connection1);
+        int result2 = connection2.compareTo(connection3);
+        int result3 = connection2.compareTo(connection4);
+
+        assertTrue(result1 > 0);
+        assertTrue(result2 < 0);
+        assertTrue(result3 == 0);
     }
 
 }

@@ -1,8 +1,6 @@
 package com.netcracker.edu.inventory.model.impl;
 
-import com.netcracker.edu.inventory.AssertUtilities;
 import com.netcracker.edu.inventory.model.Device;
-import com.netcracker.edu.inventory.service.impl.DeviceServiceImplTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -84,6 +82,26 @@ public class AbstractDeviceTest {
         Date result = device.getProductionDate();
 
         assertEquals(productionDate, result);
+    }
+
+    @Test
+    public void compareTo() throws Exception {
+        Device device1 = new AbstractDevice() {};
+        device1.setIn(1);
+        Device device2 = new AbstractDevice() {};
+        device2.setIn(2);
+        Device device3 = new AbstractDevice() {};
+        device3.setIn(3);
+        Device device4 = new AbstractDevice() {};
+        device4.setIn(2);
+
+        int result1 = device2.compareTo(device1);
+        int result2 = device2.compareTo(device3);
+        int result3 = device2.compareTo(device4);
+
+        assertTrue(result1 > 0);
+        assertTrue(result2 < 0);
+        assertTrue(result3 == 0);
     }
 
 }

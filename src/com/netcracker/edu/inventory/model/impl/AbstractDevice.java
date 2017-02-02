@@ -1,6 +1,7 @@
 package com.netcracker.edu.inventory.model.impl;
 
 import com.netcracker.edu.inventory.model.Device;
+import com.netcracker.edu.inventory.model.DevicePrimaryKey;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -69,6 +70,23 @@ abstract class AbstractDevice implements Device, Serializable {
     @Override
     public void setProductionDate(Date productionDate) {
         this.productionDate = productionDate;
+    }
+
+    @Override
+    public DevicePrimaryKey getPrimaryKey() {
+        return in != 0 ? new DevicePK(in) : null;
+    }
+
+    @Override
+    public boolean isPrimaryKey() {
+        return false;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (this == o) return 0;
+        AbstractDevice that = (AbstractDevice) o;
+        return in - that.in;
     }
 
     @Deprecated

@@ -1,6 +1,7 @@
 package com.netcracker.edu.inventory.service;
 
 import com.netcracker.edu.inventory.model.Device;
+import com.netcracker.edu.inventory.model.Unique;
 
 /**The interface Service describe list of services of Inventory component
  *
@@ -43,5 +44,15 @@ public interface Service {
      * @param type - type of Devices, that will remain in the array after filtering
      */
     void filtrateByType(Device[] devices, String type);
+
+    /**
+     * Create copy of element, were all links on another elements are replaced on his primary keys.
+     *
+     * @param element - source object
+     * @param <T> - type of primary key
+     * @return - independent copy
+     *         - null, if element is null, or primary key, or no clonable
+     */
+    <T extends Unique.PrimaryKey> Unique<T> getIndependentCopy(Unique<T> element);
 
 }

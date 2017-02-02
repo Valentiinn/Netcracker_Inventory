@@ -29,11 +29,13 @@ class RackServiceImpl implements RackService {
         return inputOutputOperations.inputRack(inputStream);
     }
 
+    @Deprecated
     @Override
     public void serializeRack(Rack rack, OutputStream outputStream) throws IOException {
         inputOutputOperations.serializeRack(rack, outputStream);
     }
 
+    @Deprecated
     @Override
     public Rack deserializeRack(InputStream inputStream) throws IOException, ClassCastException, ClassNotFoundException {
         return inputOutputOperations.deserializeRack(inputStream);

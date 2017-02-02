@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -71,24 +70,30 @@ public class ConnectionServiceImplTest {
     public void writeReadConnection() throws Exception {
         PipedWriter pipedWriter = new PipedWriter();
         PipedReader pipedReader = new PipedReader(pipedWriter, PIPED_BUFER_SIZE);
-        TwistedPair twistedPair = CreateUtilities.createTwistedPair();
-        twistedPair.setAPoint(null);
-        OpticFiber opticFiber = CreateUtilities.createOpticFiber();
-        opticFiber.setBPoint(null);
-        Wireless wireless = CreateUtilities.createWireless();
-        wireless.setAPoint(null);
-        wireless.setBPoints(new ArrayList());
-        ThinCoaxial thinCoaxial = CreateUtilities.createThinCoaxial();
-        Set<Device> set = thinCoaxial.getAllDevices();
-        for (Device device : set) {
-            thinCoaxial.removeDevice(device);
-        }
+        TwistedPair twistedPair = CreateUtilities.createTwistedPairWithDevices();
+        OpticFiber opticFiber = CreateUtilities.createOpticFiberWithDevices();
+        Wireless wireless = CreateUtilities.createWirelessWithDevices();
+        ThinCoaxial thinCoaxial = CreateUtilities.createThinCoaxialWithDevices();
 
         connectionService.writeConnection(twistedPair, pipedWriter);
         connectionService.writeConnection(opticFiber, pipedWriter);
         connectionService.writeConnection(wireless, pipedWriter);
         connectionService.writeConnection(thinCoaxial, pipedWriter);
         pipedWriter.close();
+
+        twistedPair.setAPoint(twistedPair.getAPoint().getPrimaryKey());
+        opticFiber.setBPoint(opticFiber.getBPoint().getPrimaryKey());
+        wireless.setAPoint(wireless.getAPoint().getPrimaryKey());
+        wireless.setBPoint(wireless.getBPoint(0).getPrimaryKey(), 0);
+        wireless.setBPoint(wireless.getBPoint(2).getPrimaryKey(), 2);
+        Set<Device> set = thinCoaxial.getAllDevices();
+        for (Device device : set) {
+            if (device != null) {
+                Device pk = device.getPrimaryKey();
+                thinCoaxial.removeDevice(device);
+                thinCoaxial.addDevice(pk);
+            }
+        }
 
         Connection result1 = connectionService.readConnection(pipedReader);
         Connection result2 = connectionService.readConnection(pipedReader);
@@ -132,24 +137,30 @@ public class ConnectionServiceImplTest {
     public void outputInputConnection() throws Exception {
         PipedOutputStream pipedOutputStream = new PipedOutputStream();
         PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream, PIPED_BUFER_SIZE);
-        TwistedPair twistedPair = CreateUtilities.createTwistedPair();
-        twistedPair.setAPoint(null);
-        OpticFiber opticFiber = CreateUtilities.createOpticFiber();
-        opticFiber.setBPoint(null);
-        Wireless wireless = CreateUtilities.createWireless();
-        wireless.setAPoint(null);
-        wireless.setBPoints(new ArrayList());
-        ThinCoaxial thinCoaxial = CreateUtilities.createThinCoaxial();
-        Set<Device> set = thinCoaxial.getAllDevices();
-        for (Device device : set) {
-            thinCoaxial.removeDevice(device);
-        }
+        TwistedPair twistedPair = CreateUtilities.createTwistedPairWithDevices();
+        OpticFiber opticFiber = CreateUtilities.createOpticFiberWithDevices();
+        Wireless wireless = CreateUtilities.createWirelessWithDevices();
+        ThinCoaxial thinCoaxial = CreateUtilities.createThinCoaxialWithDevices();
 
         connectionService.outputConnection(twistedPair, pipedOutputStream);
         connectionService.outputConnection(opticFiber, pipedOutputStream);
         connectionService.outputConnection(wireless, pipedOutputStream);
         connectionService.outputConnection(thinCoaxial, pipedOutputStream);
         pipedOutputStream.close();
+
+        twistedPair.setAPoint(twistedPair.getAPoint().getPrimaryKey());
+        opticFiber.setBPoint(opticFiber.getBPoint().getPrimaryKey());
+        wireless.setAPoint(wireless.getAPoint().getPrimaryKey());
+        wireless.setBPoint(wireless.getBPoint(0).getPrimaryKey(), 0);
+        wireless.setBPoint(wireless.getBPoint(2).getPrimaryKey(), 2);
+        Set<Device> set = thinCoaxial.getAllDevices();
+        for (Device device : set) {
+            if (device != null) {
+                Device pk = device.getPrimaryKey();
+                thinCoaxial.removeDevice(device);
+                thinCoaxial.addDevice(pk);
+            }
+        }
 
         Connection result1 = connectionService.inputConnection(pipedInputStream);
         Connection result2 = connectionService.inputConnection(pipedInputStream);
@@ -192,18 +203,10 @@ public class ConnectionServiceImplTest {
     @Test
     public void outputToFile() throws Exception {
         FileOutputStream fileOutputStream = new FileOutputStream(BINARY_FILE_NAME);
-        TwistedPair twistedPair = CreateUtilities.createTwistedPair();
-        twistedPair.setAPoint(null);
-        OpticFiber opticFiber = CreateUtilities.createOpticFiber();
-        opticFiber.setBPoint(null);
-        Wireless wireless = CreateUtilities.createWireless();
-        wireless.setAPoint(null);
-        wireless.setBPoints(new ArrayList());
-        ThinCoaxial thinCoaxial = CreateUtilities.createThinCoaxial();
-        Set<Device> set = thinCoaxial.getAllDevices();
-        for (Device device : set) {
-            thinCoaxial.removeDevice(device);
-        }
+        TwistedPair twistedPair = CreateUtilities.createTwistedPairWithDevices();
+        OpticFiber opticFiber = CreateUtilities.createOpticFiberWithDevices();
+        Wireless wireless = CreateUtilities.createWirelessWithDevices();
+        ThinCoaxial thinCoaxial = CreateUtilities.createThinCoaxialWithDevices();
 
         connectionService.outputConnection(twistedPair, fileOutputStream);
         connectionService.outputConnection(opticFiber, fileOutputStream);
@@ -215,24 +218,32 @@ public class ConnectionServiceImplTest {
     @Test
     public void writeToFile() throws Exception {
         FileWriter fileWriter = new FileWriter(TEXT_FILE_NAME);
-        TwistedPair twistedPair = CreateUtilities.createTwistedPair();
-        twistedPair.setAPoint(null);
-        OpticFiber opticFiber = CreateUtilities.createOpticFiber();
-        opticFiber.setBPoint(null);
-        Wireless wireless = CreateUtilities.createWireless();
-        wireless.setAPoint(null);
-        wireless.setBPoints(new ArrayList());
-        ThinCoaxial thinCoaxial = CreateUtilities.createThinCoaxial();
-        Set<Device> set = thinCoaxial.getAllDevices();
-        for (Device device : set) {
-            thinCoaxial.removeDevice(device);
-        }
+        TwistedPair twistedPair = CreateUtilities.createTwistedPairWithDevices();
+        OpticFiber opticFiber = CreateUtilities.createOpticFiberWithDevices();
+        Wireless wireless = CreateUtilities.createWirelessWithDevices();
+        ThinCoaxial thinCoaxial = CreateUtilities.createThinCoaxialWithDevices();
 
         connectionService.writeConnection(twistedPair, fileWriter);
         connectionService.writeConnection(opticFiber, fileWriter);
         connectionService.writeConnection(wireless, fileWriter);
         connectionService.writeConnection(thinCoaxial, fileWriter);
         fileWriter.close();
+    }
+
+    @Test
+    public void serializeToFile() throws Exception {
+        FileOutputStream fileOutputStream = new FileOutputStream(OBJECT_FILE_NAME);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        TwistedPair twistedPair = CreateUtilities.createTwistedPairWithDevices();
+        OpticFiber opticFiber = CreateUtilities.createOpticFiberWithDevices();
+        Wireless wireless = CreateUtilities.createWirelessWithDevices();
+        ThinCoaxial thinCoaxial = CreateUtilities.createThinCoaxialWithDevices();
+
+        objectOutputStream.writeObject(twistedPair);
+        objectOutputStream.writeObject(opticFiber);
+        objectOutputStream.writeObject(wireless);
+        objectOutputStream.writeObject(thinCoaxial);
+        fileOutputStream.close();
     }
 
 }

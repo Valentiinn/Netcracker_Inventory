@@ -3,7 +3,8 @@ package com.netcracker.edu.inventory.model.impl;
 import com.netcracker.edu.inventory.AssertUtilities;
 import com.netcracker.edu.inventory.CreateUtilities;
 import com.netcracker.edu.inventory.model.Device;
-import com.netcracker.edu.inventory.service.impl.DeviceServiceImplTest;
+import com.netcracker.edu.inventory.model.DevicePrimaryKey;
+import com.netcracker.edu.inventory.model.Unique;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,6 +74,28 @@ public class BatteryTest {
         result1.fillAllFields(battery.getAllFieldsList());
 
         AssertUtilities.assertBattery(battery, result1);
+    }
+
+    @Test
+    public void isPrimaryKey() throws Exception {
+        assertFalse(battery.isPrimaryKey());
+    }
+
+    @Test
+    public void getPrimaryKey() throws Exception {
+        battery.setIn(5);
+        DevicePrimaryKey expDevicePK = new DevicePK(battery.getIn());
+
+        Unique.PrimaryKey primaryKey = battery.getPrimaryKey();
+
+        AssertUtilities.assertSomePK(expDevicePK, primaryKey);
+    }
+
+    @Test
+    public void getPrimaryKey_PK_NULL() throws Exception {
+        Unique.PrimaryKey primaryKey = battery.getPrimaryKey();
+
+        assertNull(primaryKey);
     }
 
 }

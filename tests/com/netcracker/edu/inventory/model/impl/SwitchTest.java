@@ -2,17 +2,13 @@ package com.netcracker.edu.inventory.model.impl;
 
 import com.netcracker.edu.inventory.AssertUtilities;
 import com.netcracker.edu.inventory.CreateUtilities;
-import com.netcracker.edu.inventory.model.Connection;
-import com.netcracker.edu.inventory.model.ConnectorType;
-import com.netcracker.edu.inventory.model.Device;
-import com.netcracker.edu.inventory.service.impl.DeviceServiceImplTest;
+import com.netcracker.edu.inventory.model.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -23,6 +19,7 @@ public class SwitchTest {
 
     Switch defaultSwitch;
     Switch aSwitch;
+    Switch switchWithConnections;
 
     int numberOfPorts = 0;
 
@@ -30,6 +27,7 @@ public class SwitchTest {
     public void before() throws Exception {
         defaultSwitch = new Switch();
         aSwitch = CreateUtilities.createSwitch();
+        switchWithConnections = CreateUtilities.createSwitchWithConnections();
     }
 
     @After
@@ -94,38 +92,55 @@ public class SwitchTest {
 
     @Test
     public void testGetAndFeelAllFieldsArray() throws Exception {
-        aSwitch = CreateUtilities.createSwitch();
-
         Device result1 = new Switch();
-        result1.feelAllFields(aSwitch.getAllFields());
+        result1.feelAllFields(switchWithConnections.getAllFields());
 
-        AssertUtilities.assertDevice(aSwitch, result1);
+        AssertUtilities.assertDevice(switchWithConnections, result1);
     }
 
     @Test
     public void testGetAndFeelAllFieldsArray_EmptyDevice() throws Exception {
         Device result1 = new Switch();
-        result1.feelAllFields(aSwitch.getAllFields());
+        result1.feelAllFields(switchWithConnections.getAllFields());
 
-        AssertUtilities.assertDevice(aSwitch, result1);
+        AssertUtilities.assertDevice(switchWithConnections, result1);
     }
 
     @Test
     public void testGetAndFeelAllFields() throws Exception {
-        aSwitch = CreateUtilities.createSwitch();
-
         Switch result1 = new Switch();
-        result1.fillAllFields(aSwitch.getAllFieldsList());
+        result1.fillAllFields(switchWithConnections.getAllFieldsList());
 
-        AssertUtilities.assertSwitch(aSwitch, result1);
+        AssertUtilities.assertSwitch(switchWithConnections, result1);
     }
 
     @Test
     public void testGetAndFeelAllFields_EmptyDevice() throws Exception {
         Switch result1 = new Switch();
-        result1.fillAllFields(aSwitch.getAllFieldsList());
+        result1.fillAllFields(switchWithConnections.getAllFieldsList());
 
-        AssertUtilities.assertSwitch(aSwitch, result1);
+        AssertUtilities.assertSwitch(switchWithConnections, result1);
+    }
+
+    @Test
+    public void isPrimaryKey() throws Exception {
+        assertFalse(defaultSwitch.isPrimaryKey());
+    }
+
+    @Test
+    public void getPrimaryKey() throws Exception {
+        DevicePrimaryKey expDevicePK = new DevicePK(aSwitch.getIn());
+
+        Unique.PrimaryKey primaryKey = aSwitch.getPrimaryKey();
+
+        AssertUtilities.assertSomePK(expDevicePK, primaryKey);
+    }
+
+    @Test
+    public void getPrimaryKey_PK_NULL() throws Exception {
+        Unique.PrimaryKey primaryKey = defaultSwitch.getPrimaryKey();
+
+        assertNull(primaryKey);
     }
 
 }

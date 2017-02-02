@@ -64,6 +64,10 @@ class ParserUtils {
                 String connectorType = removeSpace(stringTokenizer.nextToken());
                 field.setValue(ConnectorType.valueOf(connectorType));
             }
+            if (type == Connection.class) {
+                Connection connection = removeSpace(stringTokenizer.nextToken()) == null ? null : null;
+                field.setValue(connection);
+            }
             if (type == OpticFiber.Mode.class) {
                 String mode = removeSpace(stringTokenizer.nextToken());
                 field.setValue(mode == null ? OpticFiber.Mode.need_init : OpticFiber.Mode.valueOf(mode));
@@ -137,6 +141,10 @@ class ParserUtils {
             if (type == OpticFiber.Mode.class) {
                 String mode = dataInputStream.readUTF();
                 field.setValue(OpticFiber.Mode.valueOf(mode));
+            }
+            if (type == Connection.class) {
+                Connection connection = dataInputStream.readUTF().equals("\n") ? null : null;
+                field.setValue(connection);
             }
             if (type == TwistedPair.Type.class) {
                 String numType = dataInputStream.readUTF();

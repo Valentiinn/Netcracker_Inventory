@@ -2,13 +2,15 @@ package com.netcracker.edu.inventory.model;
 
 import com.netcracker.edu.location.Location;
 
+import java.io.Serializable;
+
 /**
  * The interface Rack describe contract of mutable device-holder,
  * with limited volume of slots. Slots ara ordered and can fills and released randomly. *
  *
  * Created by makovetskyi on 05.10.2016.
  */
-public interface Rack<D extends Device> {
+public interface Rack<D extends Device> extends Unique<RackPrimaryKey>, Serializable {
 
     /**
      *

@@ -2,16 +2,15 @@ package com.netcracker.edu.inventory.service.impl;
 
 import com.netcracker.edu.inventory.AssertUtilities;
 import com.netcracker.edu.inventory.CreateUtilities;
+import com.netcracker.edu.inventory.model.ConnectionPrimaryKey;
 import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.model.Rack;
 import com.netcracker.edu.inventory.model.impl.*;
 import com.netcracker.edu.inventory.service.RackService;
-import com.netcracker.edu.location.Location;
 import com.netcracker.edu.location.impl.LocationStubImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
 
@@ -42,9 +41,8 @@ public class RackServiceImplTest {
     public void writeReadRack() throws Exception {
         PipedWriter pipedWriter = new PipedWriter();
         PipedReader pipedReader = new PipedReader(pipedWriter);
-        Switch aSwitch = CreateUtilities.createSwitch();
+        Switch aSwitch = CreateUtilities.createSwitchWithConnections();
         Router router = CreateUtilities.createRouter();
-        router.setIn(5);
         Rack emptyRack = new RackArrayImpl(0, Device.class);
         Rack partlyRack =  new RackArrayImpl(3, Router.class);
         partlyRack.setLocation(new LocationStubImpl("ua.od.onpu.ics.607.east_wall", "NC_TC_Odessa"));
@@ -54,6 +52,13 @@ public class RackServiceImplTest {
         rackService.writeRack(emptyRack, pipedWriter);
         rackService.writeRack(partlyRack, pipedWriter);
         pipedWriter.close();
+
+        for (int i = 0; i < aSwitch.getNumberOfPorts(); i++) {
+            if (aSwitch.getPortConnection(i) != null) {
+                ConnectionPrimaryKey pk = (ConnectionPrimaryKey) aSwitch.getPortConnection(i).getPrimaryKey();
+                aSwitch.setPortConnection(pk, i);
+            }
+        }
 
         Rack result1 = rackService.readRack(pipedReader);
         Rack result2 = rackService.readRack(pipedReader);
@@ -91,9 +96,8 @@ public class RackServiceImplTest {
 
         PipedOutputStream pipedOutputStream = new PipedOutputStream();
         PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream);
-        Switch aSwitch = CreateUtilities.createSwitch();
+        Switch aSwitch = CreateUtilities.createSwitchWithConnections();
         Router router = CreateUtilities.createRouter();
-        router.setIn(5);
         Rack emptyRack = new RackArrayImpl(0, Device.class);
         Rack partlyRack =  new RackArrayImpl(3, Router.class);
         partlyRack.setLocation(new LocationStubImpl("ua.od.onpu.ics.607.east_wall", "NC_TC_Odessa"));
@@ -103,6 +107,13 @@ public class RackServiceImplTest {
         rackService.outputRack(emptyRack, pipedOutputStream);
         rackService.outputRack(partlyRack, pipedOutputStream);
         pipedOutputStream.close();
+
+        for (int i = 0; i < aSwitch.getNumberOfPorts(); i++) {
+            if (aSwitch.getPortConnection(i) != null) {
+                ConnectionPrimaryKey pk = (ConnectionPrimaryKey) aSwitch.getPortConnection(i).getPrimaryKey();
+                aSwitch.setPortConnection(pk, i);
+            }
+        }
 
         Rack result1 = rackService.inputRack(pipedInputStream);
         Rack result2 = rackService.inputRack(pipedInputStream);
@@ -135,13 +146,13 @@ public class RackServiceImplTest {
         rackService.inputRack(null);
     }
 
+    @Deprecated
     @Test
     public void serializeDeserializeRack() throws Exception {
         PipedOutputStream pipedOutputStream = new PipedOutputStream();
         PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream, 4096);
         Switch aSwitch = CreateUtilities.createSwitch();
         Router router = CreateUtilities.createRouter();
-        router.setIn(5);
         Rack emptyRack = new RackArrayImpl(0, Device.class);
         Rack partlyRack =  new RackArrayImpl(3, Router.class);
         partlyRack.setLocation(new LocationStubImpl("ua.od.onpu.ics.607.east_wall", "NC_TC_Odessa"));
@@ -160,6 +171,7 @@ public class RackServiceImplTest {
         AssertUtilities.assertRack(partlyRack, result2);
     }
 
+    @Deprecated
     @Test
     public void serializeRackRackNull() throws Exception {
         PipedOutputStream pipedOutputStream = new PipedOutputStream();
@@ -172,12 +184,14 @@ public class RackServiceImplTest {
         pipedInputStream.close();
     }
 
+    @Deprecated
     @Test(expected = IllegalArgumentException.class)
     public void serializeRackStreamNull() throws Exception {
         Rack emptyRack = new RackArrayImpl(0, Device.class);
         rackService.serializeRack(emptyRack, null);
     }
 
+    @Deprecated
     @Test(expected = IllegalArgumentException.class)
     public void deserializeRackNull() throws Exception {
         rackService.deserializeRack(null);
@@ -186,9 +200,8 @@ public class RackServiceImplTest {
     @Test
     public void outputToFile() throws Exception {
         FileOutputStream fileOutputStream = new FileOutputStream(BINARY_FILE_NAME);
-        Switch aSwitch = CreateUtilities.createSwitch();
+        Switch aSwitch = CreateUtilities.createSwitchWithConnections();
         Router router = CreateUtilities.createRouter();
-        router.setIn(5);
         Rack emptyRack = new RackArrayImpl(0, Device.class);
         Rack partlyRack =  new RackArrayImpl(3, Router.class);
         partlyRack.setLocation(new LocationStubImpl("ua.od.onpu.ics.607.east_wall", "NC_TC_Odessa"));
@@ -203,9 +216,8 @@ public class RackServiceImplTest {
     @Test
     public void writeToFile() throws Exception {
         FileWriter fileWriter = new FileWriter(TEXT_FILE_NAME);
-        Switch aSwitch = CreateUtilities.createSwitch();
+        Switch aSwitch = CreateUtilities.createSwitchWithConnections();
         Router router = CreateUtilities.createRouter();
-        router.setIn(5);
         Rack emptyRack = new RackArrayImpl(0, Device.class);
         Rack partlyRack =  new RackArrayImpl(3, Router.class);
         partlyRack.setLocation(new LocationStubImpl("ua.od.onpu.ics.607.east_wall", "NC_TC_Odessa"));
@@ -220,17 +232,17 @@ public class RackServiceImplTest {
     @Test
     public void serializeToFile() throws Exception {
         FileOutputStream fileOutputStream = new FileOutputStream(OBJECT_FILE_NAME);
-        Switch aSwitch = CreateUtilities.createSwitch();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        Switch aSwitch = CreateUtilities.createSwitchWithConnections();
         Router router = CreateUtilities.createRouter();
-        router.setIn(5);
         Rack emptyRack = new RackArrayImpl(0, Device.class);
         Rack partlyRack =  new RackArrayImpl(3, Router.class);
         partlyRack.setLocation(new LocationStubImpl("ua.od.onpu.ics.607.east_wall", "NC_TC_Odessa"));
         partlyRack.insertDevToSlot(aSwitch, 0);
         partlyRack.insertDevToSlot(router, 2);
 
-        rackService.serializeRack(emptyRack, fileOutputStream);
-        rackService.serializeRack(partlyRack, fileOutputStream);
+        objectOutputStream.writeObject(emptyRack);
+        objectOutputStream.writeObject(partlyRack);
         fileOutputStream.close();
     }
 

@@ -2,9 +2,7 @@ package com.netcracker.edu.inventory.model.impl;
 
 import com.netcracker.edu.inventory.AssertUtilities;
 import com.netcracker.edu.inventory.CreateUtilities;
-import com.netcracker.edu.inventory.model.Connection;
-import com.netcracker.edu.inventory.model.ConnectorType;
-import com.netcracker.edu.inventory.model.Device;
+import com.netcracker.edu.inventory.model.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -149,8 +147,6 @@ public class WirelessTest {
     @Deprecated
     @Test
     public void testGetAndFeelAllFieldsArray() throws Exception {
-        wireless = CreateUtilities.createWireless();
-
         Wireless result1 = new Wireless();
         result1.feelAllFields(wireless.getAllFields());
 
@@ -168,8 +164,6 @@ public class WirelessTest {
 
     @Test
     public void testGetAndFeelAllFields() throws Exception {
-        wireless = CreateUtilities.createWireless();
-
         Wireless result1 = new Wireless();
         result1.fillAllFields(wireless.getAllFieldsList());
 
@@ -182,6 +176,47 @@ public class WirelessTest {
         result1.fillAllFields(wireless.getAllFieldsList());
 
         AssertUtilities.assertWireless(wireless, result1);
+    }
+
+    @Test
+    public void isPrimaryKey() throws Exception {
+        assertFalse(wireless.isPrimaryKey());
+    }
+
+    @Test
+    public void getPrimaryKey() throws Exception {
+        ConnectionPrimaryKey expConnectionPK = new ConnectionPK(wireless.getTrunk(), wireless.getSerialNumber());
+
+        Unique.PrimaryKey primaryKey = wireless.getPrimaryKey();
+
+        AssertUtilities.assertSomePK(expConnectionPK, primaryKey);
+    }
+
+    @Test
+    public void getPrimaryKey_PK_NULL() throws Exception {
+        Unique.PrimaryKey primaryKey = defaultWireless.getPrimaryKey();
+
+        assertNull(primaryKey);
+    }
+
+    @Test
+    public void compareTo() throws Exception {
+        Connection connection1 = new Wireless();
+        connection1.setSerialNumber(1);
+        Connection connection2 = new Wireless();
+        connection2.setSerialNumber(2);
+        Connection connection3 = new Wireless();
+        connection3.setSerialNumber(3);
+        Connection connection4 = new Wireless();
+        connection4.setSerialNumber(2);
+
+        int result1 = connection2.compareTo(connection1);
+        int result2 = connection2.compareTo(connection3);
+        int result3 = connection2.compareTo(connection4);
+
+        assertTrue(result1 > 0);
+        assertTrue(result2 < 0);
+        assertTrue(result3 == 0);
     }
 
 }

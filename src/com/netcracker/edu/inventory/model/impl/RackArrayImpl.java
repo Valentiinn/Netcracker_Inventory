@@ -3,6 +3,7 @@ package com.netcracker.edu.inventory.model.impl;
 import com.netcracker.edu.inventory.exception.DeviceValidationException;
 import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.model.Rack;
+import com.netcracker.edu.inventory.model.RackPrimaryKey;
 import com.netcracker.edu.location.Location;
 
 import java.io.Serializable;
@@ -127,7 +128,7 @@ public class RackArrayImpl<T extends Device> implements Rack<T>, Serializable {
             throw e;
         }
     }
-
+    
     private void setRackSize(int size) {
         if (size < 0) {
             IllegalArgumentException e = new IllegalArgumentException("Rack size should not be negative");
@@ -136,5 +137,15 @@ public class RackArrayImpl<T extends Device> implements Rack<T>, Serializable {
         } else {
             this.devices = (T[]) new Device[size];
         }
+    }
+
+    @Override
+    public boolean isPrimaryKey() {
+        return false;
+    }
+
+    @Override
+    public RackPrimaryKey getPrimaryKey() {
+        return location != null ? new RackPK<T>(location) : null;
     }
 }

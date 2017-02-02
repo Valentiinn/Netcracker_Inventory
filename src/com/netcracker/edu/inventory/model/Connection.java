@@ -1,5 +1,7 @@
 package com.netcracker.edu.inventory.model;
 
+import com.netcracker.edu.location.Trunk;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -9,7 +11,7 @@ import java.util.List;
  *
  * Created by makovetskyi on 10.11.16.
  */
-public interface Connection<A extends Device, B extends Device> extends FeelableEntity, Serializable {
+public interface Connection<A extends Device, B extends Device> extends FeelableEntity, Unique<ConnectionPrimaryKey>, Serializable, Comparable {
 
     String PLANED = "Planed"; // must be default
     String ON_BUILD = "On build";
@@ -17,6 +19,14 @@ public interface Connection<A extends Device, B extends Device> extends Feelable
     String USED = "Used";
     String ON_DISASSEMBLING = "On disassembling";
     String DISASSEMBLED = "Disassembled";
+
+    Trunk getTrunk();
+
+    void setTrunk(Trunk trunk);
+
+    int getSerialNumber();
+
+    void setSerialNumber(int serialNumber);
 
     String getStatus();
 

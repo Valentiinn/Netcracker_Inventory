@@ -1,19 +1,17 @@
 package com.netcracker.edu.inventory.service.impl;
 
+import com.netcracker.edu.inventory.AssertUtilities;
+import com.netcracker.edu.inventory.CreateUtilities;
+import com.netcracker.edu.inventory.model.Connection;
 import com.netcracker.edu.inventory.model.Device;
-import com.netcracker.edu.inventory.model.impl.Battery;
-import com.netcracker.edu.inventory.model.impl.Router;
-import com.netcracker.edu.inventory.model.impl.Switch;
-import com.netcracker.edu.inventory.model.impl.WifiRouter;
+import com.netcracker.edu.inventory.model.Rack;
+import com.netcracker.edu.inventory.model.impl.*;
 import com.netcracker.edu.inventory.service.DeviceService;
 import com.netcracker.edu.inventory.service.RackService;
 import com.netcracker.edu.inventory.service.Service;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import java.util.Date;
 
 import static org.junit.Assert.*;
 
@@ -103,6 +101,40 @@ public class ServiceImplTest {
         service.filtrateByType(devices, null);
 
         assertArrayEquals(expResult, devices);
+    }
+
+    @Test
+    public void getIndependentCopy() throws Exception {
+        WifiRouter device = CreateUtilities.createWifiRouterWithConnections();
+        Rack rack = new RackArrayImpl(5, Router.class);
+        Wireless connection = CreateUtilities.createWirelessWithDevices();
+
+        WifiRouter expDevice = CreateUtilities.createWifiRouterWithConnections();
+        Rack expRack = new RackArrayImpl(5, Router.class);
+        Wireless expConnection = CreateUtilities.createWirelessWithDevices();
+
+        Router routerRack = CreateUtilities.createRouter();
+        Switch aSwitch = CreateUtilities.createSwitchWithConnections();
+        WifiRouter wifiRouter = CreateUtilities.createWifiRouterWithConnections();
+        rack.insertDevToSlot(routerRack, 0);
+        rack.insertDevToSlot(aSwitch, 2);
+        rack.insertDevToSlot(wifiRouter, 4);
+        expRack.insertDevToSlot((Device) service.getIndependentCopy(routerRack), 0);
+        expRack.insertDevToSlot((Device) service.getIndependentCopy(aSwitch), 2);
+        expRack.insertDevToSlot((Device) service.getIndependentCopy(wifiRouter), 4);
+        expDevice.setWireConnection((Connection) device.getWireConnection().getPrimaryKey());
+        expDevice.setWirelessConnection((Connection) device.getWirelessConnection().getPrimaryKey());
+        expConnection.setAPoint(connection.getAPoint().getPrimaryKey());
+        expConnection.setBPoint(connection.getBPoint(0).getPrimaryKey(), 0);
+        expConnection.setBPoint(connection.getBPoint(2).getPrimaryKey(), 2);
+
+        Device result1 = (Device) service.getIndependentCopy(device);
+        Rack result2 = (Rack) service.getIndependentCopy(rack);
+        Connection result3 = (Connection) service.getIndependentCopy(connection);
+
+        AssertUtilities.assertSomeDevice(expDevice, result1);
+        AssertUtilities.assertRack(expRack, result2);
+        AssertUtilities.assertSomeConnection(expConnection, result3);
     }
 
 }

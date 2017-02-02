@@ -77,6 +77,7 @@ public interface DeviceService {
      * @param device - source Device
      * @param outputStream - targeted binary stream
      */
+    @Deprecated
     void serializeDevice(Device device, OutputStream outputStream) throws IOException;
 
     /**
@@ -85,6 +86,7 @@ public interface DeviceService {
      * @param inputStream - source binary stream
      * @return - received Device instance
      */
+    @Deprecated
     Device deserializeDevice(InputStream inputStream) throws IOException, ClassCastException, ClassNotFoundException;
 
 }

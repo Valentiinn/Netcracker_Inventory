@@ -3,7 +3,9 @@ package com.netcracker.edu.inventory.model.impl;
 import com.netcracker.edu.inventory.AssertUtilities;
 import com.netcracker.edu.inventory.CreateUtilities;
 import com.netcracker.edu.inventory.model.Connection;
+import com.netcracker.edu.inventory.model.ConnectionPrimaryKey;
 import com.netcracker.edu.inventory.model.ConnectorType;
+import com.netcracker.edu.inventory.model.Unique;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -106,8 +108,6 @@ public class OpticFiberTest {
     @Deprecated
     @Test
     public void testGetAndFeelAllFieldsArray() throws Exception {
-        opticFiber = CreateUtilities.createOpticFiber();
-
         OpticFiber result1 = new OpticFiber();
         result1.feelAllFields(opticFiber.getAllFields());
 
@@ -125,8 +125,6 @@ public class OpticFiberTest {
 
     @Test
     public void testGetAndFeelAllFields() throws Exception {
-        opticFiber = CreateUtilities.createOpticFiber();
-
         OpticFiber result1 = new OpticFiber();
         result1.fillAllFields(opticFiber.getAllFieldsList());
 
@@ -139,6 +137,47 @@ public class OpticFiberTest {
         result1.fillAllFields(opticFiber.getAllFieldsList());
 
         AssertUtilities.assertOpticFiber(opticFiber, result1);
+    }
+
+    @Test
+    public void isPrimaryKey() throws Exception {
+        assertFalse(defaultOpticFiber.isPrimaryKey());
+    }
+
+    @Test
+    public void getPrimaryKey() throws Exception {
+        ConnectionPrimaryKey expConnectionPK = new ConnectionPK(opticFiber.getTrunk(), opticFiber.getSerialNumber());
+
+        Unique.PrimaryKey primaryKey = opticFiber.getPrimaryKey();
+
+        AssertUtilities.assertSomePK(expConnectionPK, primaryKey);
+    }
+
+    @Test
+    public void getPrimaryKey_PK_NULL() throws Exception {
+        Unique.PrimaryKey primaryKey = defaultOpticFiber.getPrimaryKey();
+
+        assertNull(primaryKey);
+    }
+
+    @Test
+    public void compareTo() throws Exception {
+        Connection connection1 = new OpticFiber();
+        connection1.setSerialNumber(1);
+        Connection connection2 = new OpticFiber();
+        connection2.setSerialNumber(2);
+        Connection connection3 = new OpticFiber();
+        connection3.setSerialNumber(3);
+        Connection connection4 = new OpticFiber();
+        connection4.setSerialNumber(2);
+
+        int result1 = connection2.compareTo(connection1);
+        int result2 = connection2.compareTo(connection3);
+        int result3 = connection2.compareTo(connection4);
+
+        assertTrue(result1 > 0);
+        assertTrue(result2 < 0);
+        assertTrue(result3 == 0);
     }
 
 }

@@ -1,21 +1,8 @@
 package com.netcracker.edu.inventory.service.impl;
 
-import com.netcracker.edu.inventory.AssertUtilities;
-import com.netcracker.edu.inventory.CreateUtilities;
-import com.netcracker.edu.inventory.model.*;
-import com.netcracker.edu.inventory.model.impl.*;
-import com.netcracker.edu.location.impl.LocationStubImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.util.Date;
-
-import static org.junit.Assert.*;
 
 /**
  * Test only methods are presents

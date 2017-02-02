@@ -2,9 +2,7 @@ package com.netcracker.edu.inventory.model.impl;
 
 import com.netcracker.edu.inventory.AssertUtilities;
 import com.netcracker.edu.inventory.CreateUtilities;
-import com.netcracker.edu.inventory.model.Connection;
-import com.netcracker.edu.inventory.model.ConnectorType;
-import com.netcracker.edu.inventory.model.Device;
+import com.netcracker.edu.inventory.model.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -107,8 +105,6 @@ public class TwistedPairTest {
     @Deprecated
     @Test
     public void testGetAndFeelAllFieldsArray() throws Exception {
-        twistedPair = CreateUtilities.createTwistedPair();
-
         TwistedPair result1 = new TwistedPair();
         result1.feelAllFields(twistedPair.getAllFields());
 
@@ -126,8 +122,6 @@ public class TwistedPairTest {
 
     @Test
     public void testGetAndFeelAllFields() throws Exception {
-        twistedPair = CreateUtilities.createTwistedPair();
-
         TwistedPair result1 = new TwistedPair();
         result1.fillAllFields(twistedPair.getAllFieldsList());
 
@@ -140,6 +134,47 @@ public class TwistedPairTest {
         result1.fillAllFields(twistedPair.getAllFieldsList());
 
         AssertUtilities.assertTwistedPair(twistedPair, result1);
+    }
+
+    @Test
+    public void isPrimaryKey() throws Exception {
+        assertFalse(twistedPair.isPrimaryKey());
+    }
+
+    @Test
+    public void getPrimaryKey() throws Exception {
+        ConnectionPrimaryKey expConnectionPK = new ConnectionPK(twistedPair.getTrunk(), twistedPair.getSerialNumber());
+
+        Unique.PrimaryKey primaryKey = twistedPair.getPrimaryKey();
+
+        AssertUtilities.assertSomePK(expConnectionPK, primaryKey);
+    }
+
+    @Test
+    public void getPrimaryKey_PK_NULL() throws Exception {
+        Unique.PrimaryKey primaryKey = defaultTwistedPair.getPrimaryKey();
+
+        assertNull(primaryKey);
+    }
+
+    @Test
+    public void compareTo() throws Exception {
+        Connection connection1 = new TwistedPair();
+        connection1.setSerialNumber(1);
+        Connection connection2 = new TwistedPair();
+        connection2.setSerialNumber(2);
+        Connection connection3 = new TwistedPair();
+        connection3.setSerialNumber(3);
+        Connection connection4 = new TwistedPair();
+        connection4.setSerialNumber(2);
+
+        int result1 = connection2.compareTo(connection1);
+        int result2 = connection2.compareTo(connection3);
+        int result3 = connection2.compareTo(connection4);
+
+        assertTrue(result1 > 0);
+        assertTrue(result2 < 0);
+        assertTrue(result3 == 0);
     }
 
 }

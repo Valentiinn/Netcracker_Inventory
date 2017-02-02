@@ -58,6 +58,8 @@ class InputOutputOperations {
                     writer.write(((Date) field.getValue()).getTime() + "");
                 } else if (field.getType() == ConnectorType.class) {
                     writer.write(((ConnectorType) field.getValue()).name());
+                } else if (field.getType() == Connection.class) {
+                    writer.write("");
                 } else if (field.getType() == Array.class) {
                     Device[] devicesArray = (Device[]) field.getValue();
                     writer.write(devicesArray.length + " |");
@@ -82,6 +84,7 @@ class InputOutputOperations {
                 writer.write(" |");
             }
         }
+
         writer.write(LineSeparator.Windows);
     }
 
@@ -110,6 +113,8 @@ class InputOutputOperations {
                     for (Device device : devicesArray) {
                         dataOutputStream.writeUTF("\n");
                     }
+                } else if (field.getType() == Connection.class) {
+                    dataOutputStream.writeUTF("\n");
                 } else if (field.getType() == Set.class) {
                     Set<Device> deviceSet = (Set<Device>) field.getValue();
                     dataOutputStream.writeInt(deviceSet.size());

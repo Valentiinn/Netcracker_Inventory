@@ -1,8 +1,11 @@
 package com.netcracker.edu.inventory.model.impl;
 
+import com.netcracker.edu.inventory.AssertUtilities;
 import com.netcracker.edu.inventory.exception.DeviceValidationException;
 import com.netcracker.edu.inventory.model.Device;
 import com.netcracker.edu.inventory.model.Rack;
+import com.netcracker.edu.inventory.model.RackPrimaryKey;
+import com.netcracker.edu.inventory.model.Unique;
 import com.netcracker.edu.inventory.service.impl.ServiceImpl;
 import com.netcracker.edu.location.Location;
 import com.netcracker.edu.location.impl.LocationStubImpl;
@@ -488,4 +491,26 @@ public class RackArrayImplTest {
     }
 
 
+
+    @Test
+    public void isPrimaryKey() throws Exception {
+        assertFalse(rackPartlyFilled.isPrimaryKey());
+    }
+
+    @Test
+    public void getPrimaryKey() throws Exception {
+        rackPartlyFilled.setLocation(new LocationStubImpl("Test", "test"));
+        RackPrimaryKey expRackPK = new RackPK(rackPartlyFilled.getLocation());
+
+        Unique.PrimaryKey primaryKey = rackPartlyFilled.getPrimaryKey();
+
+        AssertUtilities.assertSomePK(expRackPK, primaryKey);
+    }
+
+    @Test
+    public void getPrimaryKey_PK_NULL() throws Exception {
+        Unique.PrimaryKey primaryKey = rackPartlyFilled.getPrimaryKey();
+
+        assertNull(primaryKey);
+    }
 }

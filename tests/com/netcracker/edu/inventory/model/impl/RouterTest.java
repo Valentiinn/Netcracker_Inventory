@@ -3,7 +3,8 @@ package com.netcracker.edu.inventory.model.impl;
 import com.netcracker.edu.inventory.AssertUtilities;
 import com.netcracker.edu.inventory.CreateUtilities;
 import com.netcracker.edu.inventory.model.Device;
-import com.netcracker.edu.inventory.service.impl.DeviceServiceImplTest;
+import com.netcracker.edu.inventory.model.DevicePrimaryKey;
+import com.netcracker.edu.inventory.model.Unique;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,6 +74,28 @@ public class RouterTest {
         result1.fillAllFields(router.getAllFieldsList());
 
         AssertUtilities.assertRouter(router, result1);
+    }
+
+    @Test
+    public void isPrimaryKey() throws Exception {
+        assertFalse(router.isPrimaryKey());
+    }
+
+    @Test
+    public void getPrimaryKey() throws Exception {
+        router.setIn(5);
+        DevicePrimaryKey expDevicePK = new DevicePK(router.getIn());
+
+        Unique.PrimaryKey primaryKey = router.getPrimaryKey();
+
+        AssertUtilities.assertSomePK(expDevicePK, primaryKey);
+    }
+
+    @Test
+    public void getPrimaryKey_PK_NULL() throws Exception {
+        Unique.PrimaryKey primaryKey = router.getPrimaryKey();
+
+        assertNull(primaryKey);
     }
 
 }
