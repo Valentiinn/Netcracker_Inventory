@@ -128,7 +128,7 @@ public class RackArrayImpl<T extends Device> implements Rack<T>, Serializable {
             throw e;
         }
     }
-    
+
     private void setRackSize(int size) {
         if (size < 0) {
             IllegalArgumentException e = new IllegalArgumentException("Rack size should not be negative");
